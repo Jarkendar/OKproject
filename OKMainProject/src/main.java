@@ -17,6 +17,9 @@ public class main {
             name = scanner.nextLine();
         }while (name.length() != 4);
         System.out.println(name);
+
+
+        System.out.println("Dodanie kolejnej linii kodu.");
     }
 
 
