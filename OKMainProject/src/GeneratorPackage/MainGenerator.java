@@ -84,7 +84,7 @@ public class MainGenerator {
                 }else {
                     nr_mach = 2;
                 }
-                time = random.nextInt(max_time);
+                time = random.nextInt(max_time/3) + 1;
                 start_time = random.nextInt(all_time/4);
             }while(checkMaintananceRepeat(maintanances,nr_mach,time,start_time, i));
 
@@ -105,8 +105,16 @@ public class MainGenerator {
     private static boolean checkMaintananceRepeat(Maintanance[] maintanances, int nr_mach, int time, int time_start, int size){
         for (int i = 0; i<size; i++){
             if (maintanances[i].getNr_machine() == nr_mach){
-                if (time_start > (maintanances[i].getTime_start()+maintanances[i].getTime())
-                        || (time_start+time)<maintanances[i].getTime_start() ){
+                if (((time_start+time) >= maintanances[i].getTime_start()) && (time_start < maintanances[i].getTime_start())) {
+                    return true;
+                } else if (((maintanances[i].getTime_start()+maintanances[i].getTime()) >= time_start)
+                        &&((maintanances[i].getTime_start()+maintanances[i].getTime()) <= (time_start+time))) {
+                    return true;
+                } else if ((maintanances[i].getTime_start() >= time_start)
+                        &&((maintanances[i].getTime_start()+maintanances[i].getTime()) <= (time_start+time))){
+                    return true;
+                } else if ((maintanances[i].getTime_start() <= time_start)
+                        &&((maintanances[i].getTime_start()+maintanances[i].getTime()) >= (time_start+time))){
                     return true;
                 }
             }
