@@ -1,5 +1,8 @@
 package GeneratorPackage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -11,27 +14,81 @@ public class MainGenerator {
         final int machine_count = 2;
         int size = 0, max_task_time,
                 maintanance_count = 0,
-                all_time = 0;
+                all_time = 0, instance_number = 1;
 
         Scanner scanner = new Scanner(System.in);
         System.out.printf("Podaj rozmiar instancji.\n");
         size = scanner.nextInt();
         System.out.printf("Podaj maksymalny czas trwiania części zadania.\n");
         max_task_time = scanner.nextInt();
+        System.out.println("Ile instancji chcesz wygenerować?");
+        instance_number = scanner.nextInt();
 
-        System.out.println("Tworzenie list zadań i przerw.");
-        maintanance_count = (size / 8)+1;
-        Task[] tasks = new Task[size];
-        Maintanance[] maintanances = new Maintanance[maintanance_count];
+        //tworzenie folderu
+        String filepath = "Instancje\\rozmiar " + size;
+        File folder = new File(filepath);
+        folder.mkdir();
 
-        System.out.println("Wypełnianie list.");
-        all_time = fillTasksArray(tasks, max_task_time);
-        fillMaintananceArray(maintanances, max_task_time, all_time);
+        for ( int i = 0; i<instance_number ; i++) {
+            System.out.println("Tworzenie list zadań i przerw. nr" + (i+1));
+            maintanance_count = (size / 8) + 1;
+            Task[] tasks = new Task[size];
+            Maintanance[] maintanances = new Maintanance[maintanance_count];
 
-        System.out.println("\nLista zadań.");
-        DisplayTasks(tasks);
-        System.out.println("\nLista przerw.");
-        DisplayMaintanance(maintanances);
+            System.out.println("Wypełnianie list.");
+            all_time = fillTasksArray(tasks, max_task_time);
+            fillMaintananceArray(maintanances, max_task_time, all_time);
+
+            System.out.println("\nLista zadań.");
+            DisplayTasks(tasks);
+            System.out.println("\nLista przerw.");
+            DisplayMaintanance(maintanances);
+
+
+            //zapis do pliku
+            saveInstanceToFile(tasks, maintanances, size, i);
+        }
+
+    }
+
+    /**
+     * Zapis instancji do pliku wg wzorca.
+     * @param tasks - lista zadań
+     * @param maintanances - lista przerw
+     * @param size - rozmiar instancji
+     * @param nr - numer instancji o danym rozmiarze
+     */
+    private static void saveInstanceToFile(Task[] tasks, Maintanance[] maintanances, int size, int nr){
+        //folder główny projektu\Instancje\rozmiar x\nr i.txt
+        //głowica zapisująca do pliku.
+        String filename = "Instancje\\rozmiar "+size+ "\\nr "+ (nr+1) +".txt";
+        PrintWriter printWriter = null;
+
+        try {
+            printWriter = new PrintWriter(filename);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        printWriter.println("*******"+nr+"*******");
+        printWriter.println("liczba zadań " + size);
+
+        for (Task x: tasks) {
+            printWriter.println(x.getTime_part1() + ";"
+                    + x.getTime_part2() + ";"
+                    + x.getNr_machine_part1() + ";"
+                    + x.getNr_machine_part2() + ";"
+                    + x.getReady_time_part1() + ";");
+        }
+
+        for (int i = 0; i<maintanances.length; i++){
+            printWriter.println("nr przerwy " + (i+1) + "|"
+                    + maintanances[i].getNr_machine() + ";"
+                    + maintanances[i].getTime() + ";"
+                    + maintanances[i].getTime_start() + ";");
+        }
+        printWriter.println("********* EOF **********");
+        printWriter.close();
     }
 
     /**
@@ -41,7 +98,7 @@ public class MainGenerator {
      */
     private static void DisplayMaintanance(Maintanance[] maintanances){
         for (int i = 0; i<maintanances.length; i++){
-            System.out.println("nr zadania " + (i+1) + " | "
+            System.out.println("nr przerwy " + (i+1) + " | "
                                 + maintanances[i].getNr_machine() + ";"
                                 + maintanances[i].getTime() + ";"
                                 + maintanances[i].getTime_start() + ";");
@@ -56,7 +113,7 @@ public class MainGenerator {
     private static void DisplayTasks(Task[] tasks){
         int i = 1;
         for (Task x: tasks) {
-            System.out.println("nr przerwy " + (i++) + " | "
+            System.out.println("nr zadania " + (i++) + " | "
                             + x.getTime_part1() + ";"
                             + x.getTime_part2() + ";"
                             + x.getNr_machine_part1() + ";"
@@ -84,7 +141,7 @@ public class MainGenerator {
                 }else {
                     nr_mach = 2;
                 }
-                time = random.nextInt(max_time);
+                time = random.nextInt(max_time/3) + 1;
                 start_time = random.nextInt(all_time/4);
             }while(checkMaintananceRepeat(maintanances,nr_mach,time,start_time, i));
 
@@ -105,8 +162,16 @@ public class MainGenerator {
     private static boolean checkMaintananceRepeat(Maintanance[] maintanances, int nr_mach, int time, int time_start, int size){
         for (int i = 0; i<size; i++){
             if (maintanances[i].getNr_machine() == nr_mach){
-                if (time_start > (maintanances[i].getTime_start()+maintanances[i].getTime())
-                        || (time_start+time)<maintanances[i].getTime_start() ){
+                if (((time_start+time) >= maintanances[i].getTime_start()) && (time_start < maintanances[i].getTime_start())) {
+                    return true;
+                } else if (((maintanances[i].getTime_start()+maintanances[i].getTime()) >= time_start)
+                        &&((maintanances[i].getTime_start()+maintanances[i].getTime()) <= (time_start+time))) {
+                    return true;
+                } else if ((maintanances[i].getTime_start() >= time_start)
+                        &&((maintanances[i].getTime_start()+maintanances[i].getTime()) <= (time_start+time))){
+                    return true;
+                } else if ((maintanances[i].getTime_start() <= time_start)
+                        &&((maintanances[i].getTime_start()+maintanances[i].getTime()) >= (time_start+time))){
                     return true;
                 }
             }
@@ -130,7 +195,7 @@ public class MainGenerator {
             time1 = random.nextInt(max_task_time) + 1;
             time2 = random.nextInt(max_task_time) + 1;
             all_time += time1/4;
-            rdy_time1 = random.nextInt(all_time);
+            rdy_time1 = random.nextInt(all_time + 1);
             machine = random.nextBoolean();
             if (machine){
                 nr_mac1 = 1;
