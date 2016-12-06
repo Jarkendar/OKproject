@@ -3,7 +3,7 @@ package ProgramPackage;
 /**
  * Created by Jarek on 2016-12-06.
  */
-public abstract class Task {
+public abstract class Task extends SolutionElement{
     private int number_task;
     private int time_start;
     private int duration;
@@ -13,14 +13,12 @@ public abstract class Task {
     /**
      * KOnstruktor klasy Task
      * @param number_task - numer zadania
-     * @param time_start - czas rozpoczęcia
      * @param duration - czas trwania
      * @param machine_number - numer maszyny
      * @param part_number - numer części zadania
      */
-    public Task(int number_task, int time_start, int duration, byte machine_number, byte part_number) {
+    public Task(int number_task, int duration, byte machine_number, byte part_number) {
         this.number_task = number_task;
-        this.time_start = time_start;
         this.duration = duration;
         this.machine_number = machine_number;
         this.part_number = part_number;
