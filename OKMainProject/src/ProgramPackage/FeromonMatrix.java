@@ -42,10 +42,13 @@ public class FeromonMatrix {
 
     public int[] useFeromonMatrix(){
         //użycie macierzy feromonowej
+        int[] ints = new int[2];
+        return ints;
     }
 
     private int ruleteAlgorithm(int from){
         //wylosowanie docelowej ścieżki na podstawie algorytmu ruletki
+        return 0;
     }
 
 

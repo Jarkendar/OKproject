@@ -8,6 +8,7 @@ public abstract class Task {
     private int time_start;
     private int duration;
     private byte machine_number;
+    private byte part_number;
 
     /**
      * KOnstruktor klasy Task
@@ -15,12 +16,14 @@ public abstract class Task {
      * @param time_start - czas rozpoczęcia
      * @param duration - czas trwania
      * @param machine_number - numer maszyny
+     * @param part_number - numer części zadania
      */
-    public Task(int number_task, int time_start, int duration, byte machine_number) {
+    public Task(int number_task, int time_start, int duration, byte machine_number, byte part_number) {
         this.number_task = number_task;
         this.time_start = time_start;
         this.duration = duration;
         this.machine_number = machine_number;
+        this.part_number = part_number;
     }
 
     public int getNumber_task() {
@@ -53,5 +56,13 @@ public abstract class Task {
 
     public void setMachine_number(byte machine_number) {
         this.machine_number = machine_number;
+    }
+
+    public byte getPart_number() {
+        return part_number;
+    }
+
+    public void setPart_number(byte part_number) {
+        this.part_number = part_number;
     }
 }
