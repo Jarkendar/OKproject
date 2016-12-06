@@ -73,7 +73,6 @@ public class ProgramMain {
     private static Maintanance[] readMaintananceFromFile(String path, int task_count){
         Scanner scanner = new Scanner(path);
         Maintanance[] maintanances = new Maintanance[1+task_count/8];
-        int radix_count = ;
         scanner.useRadix(task_count + 2);
         for (int i = 0; i<(1+task_count/8); i++){
             String tmp = scanner.nextLine();
