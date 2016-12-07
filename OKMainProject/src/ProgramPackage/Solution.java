@@ -5,8 +5,8 @@ package ProgramPackage;
  */
 public class Solution {
     private int function_target;
-    private SolutionElement[] first_machine;
-    private SolutionElement[] second_machine;
+    private Task[] first_machine;
+    private Task[] second_machine;
 
     public int getFunction_target() {
         return function_target;

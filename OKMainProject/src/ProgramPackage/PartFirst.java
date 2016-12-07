@@ -8,14 +8,14 @@ public class PartFirst extends Task {
 
     /**
      * Konstruktor klasy PartFirst
-     * @param number_task
-     * @param duration
-     * @param machine_number
-     * @param part_number
-     * @param time_delay
+     * @param number_task - numer zadania
+     * @param duration - czas trwania
+     * @param machine_number - numer maszyny
+     * @param task_name - nazwa zadania (part1, part2, maintanance)
+     * @param time_delay - czas opóźnienia
      */
-    public PartFirst(int number_task, int duration, byte machine_number, byte part_number, int time_delay) {
-        super(number_task, duration, machine_number, part_number);
+    public PartFirst(int number_task, int duration, byte machine_number, String task_name, int time_delay) {
+        super(number_task, duration, machine_number, task_name);
         this.time_delay = time_delay;
     }
 
