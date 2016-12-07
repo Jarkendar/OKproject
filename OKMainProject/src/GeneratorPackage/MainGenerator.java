@@ -82,7 +82,7 @@ public class MainGenerator {
         }
 
         for (int i = 0; i<maintanances.length; i++){
-            printWriter.println("nr przerwy " + (i+1) + "|"
+            printWriter.println("nr przerwy " + (i+1) + ";"
                     + maintanances[i].getNr_machine() + ";"
                     + maintanances[i].getTime() + ";"
                     + maintanances[i].getTime_start() + ";");
@@ -98,7 +98,7 @@ public class MainGenerator {
      */
     private static void DisplayMaintanance(Maintanance[] maintanances){
         for (int i = 0; i<maintanances.length; i++){
-            System.out.println("nr przerwy " + (i+1) + " | "
+            System.out.println("nr przerwy " + (i+1) + " ; "
                                 + maintanances[i].getNr_machine() + ";"
                                 + maintanances[i].getTime() + ";"
                                 + maintanances[i].getTime_start() + ";");
