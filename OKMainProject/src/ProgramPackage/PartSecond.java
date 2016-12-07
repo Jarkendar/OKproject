@@ -7,14 +7,14 @@ public class PartSecond extends Task {
 
     /**
      * Konstruktor klasy PartSecond
-     * @param number_task
-     * @param duration
-     * @param machine_number
-     * @param part_number
+     * @param number_task - numer zadania
+     * @param duration - czas trwania
+     * @param machine_number - numer maszyny
+     * @param task_name - nazwa zadania (part1, part2, maintanance)
      */
-    public PartSecond(int number_task, int duration, byte machine_number, byte part_number) {
-        super(number_task, duration, machine_number, part_number);
+    public PartSecond(int number_task, int duration, byte machine_number, String task_name) {
+        super(number_task, duration, machine_number, task_name);
     }
 
-    public int getTime_delay(){ return 0;}
+    public int getTime_delay(){ return -1;}
 }

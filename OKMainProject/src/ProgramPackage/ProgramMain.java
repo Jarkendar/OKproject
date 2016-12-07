@@ -1,7 +1,5 @@
 package ProgramPackage;
 
-import jdk.nashorn.internal.runtime.regexp.joni.ScanEnvironment;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -33,22 +31,17 @@ public class ProgramMain {
     }
 
     private static void DisplayTest(Maintanance[] maintanances, Task[] tasks){
-        for (Task x: tasks) {
-            if (x.getPart_number() == 1) {
-                System.out.println("Numer zadania " + x.getNumber_task() + "; numer operacji " + x.getPart_number()
-                        + "; czas operacji : " + x.getDuration() + "; numer maszyny : "+ x.getMachine_number()
-                        + "; czas opóźnienia : "+ x.getTime_delay());
-            }else{
-                System.out.println("Numer zadania " + x.getNumber_task() + "; numer operacji " + x.getPart_number()
-                        + "; czas operacji : " + x.getDuration() + "; numer maszyny : "+ x.getMachine_number());
-            }
+        for (int i = 0; i<tasks.length; i++){
+            System.out.println("Numer zadania " + tasks[i].getNumber_task() + "; nazwa operacji : " + tasks[i].getTask_name()
+                    + "; czas operacji : " + tasks[i].getDuration() + "; numer maszyny : "+ tasks[i].getMachine_number()
+                    + "; czas opóźnienia : "+ tasks[i].getTime_delay());
         }
-        System.out.println("**********************");
-        for (Maintanance x: maintanances){
-            System.out.println("Numer przerwy : " + x.getBreak_number() + "; numer maszyny : " + x.getMachine_number()
-                        + "; czas trwania przerwy : " + x.getTime_duration() + "; czas rozpoczęcia przerwy : "
-                        + x.getTime_start());
+        for (int i = 0; i<maintanances.length; i++){
+            System.out.println("Numer przerwy " + maintanances[i].getNumber_task() + "; nazwa operacji : " + maintanances[i].getTask_name()
+                    + "; czas przerwy : " + maintanances[i].getDuration() + "; numer maszyny : "+ maintanances[i].getMachine_number()
+                    + "; czas opóźnienia : "+ maintanances[i].getTime_delay());
         }
+
     }
 
     /**
@@ -90,9 +83,9 @@ public class ProgramMain {
                     +Byte.parseByte(strings_array[2]) + " " + Byte.parseByte(strings_array[3]) + " "+ Integer.parseInt(strings_array[4]));
 
             PartFirst partFirst = new PartFirst((i+1), Integer.parseInt(strings_array[0]), Byte.parseByte(strings_array[2])
-                    , ((byte)1), Integer.parseInt(strings_array[4]));
+                    , "part1", Integer.parseInt(strings_array[4]));
             PartSecond partSecond = new PartSecond((i+1), Integer.parseInt(strings_array[1]), Byte.parseByte(strings_array[3])
-                    , ((byte)2));
+                    , "part2");
             tasks[i] = partFirst;
             tasks[i+count_objects] = partSecond;
         }
@@ -120,9 +113,8 @@ public class ProgramMain {
             String tmp = scanner.nextLine();
             tmp = tmp.substring(11);
             String[] strings_array = tmp.split(";");
-            Maintanance maintanance = new Maintanance(Integer.parseInt(strings_array[0]),
-                    Byte.parseByte(strings_array[1]), Integer.parseInt(strings_array[2]),
-                    Integer.parseInt(strings_array[3]));
+            Maintanance maintanance = new Maintanance(Integer.parseInt(strings_array[0]), Integer.parseInt(strings_array[2])
+                    , Byte.parseByte(strings_array[1]), "maintanance", Integer.parseInt(strings_array[3]));
             maintanances[i] = maintanance;
         }
         return maintanances;

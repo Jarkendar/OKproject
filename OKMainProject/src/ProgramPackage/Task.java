@@ -3,25 +3,24 @@ package ProgramPackage;
 /**
  * Created by Jarek on 2016-12-06.
  */
-public abstract class Task extends SolutionElement{
+public abstract class Task {
     private int number_task;
-    private int time_start;
+    private int time_start; //zmienna potrzebna do tworzenia rozwiązań
     private int duration;
     private byte machine_number;
-    private byte part_number;
-
+    private String task_name;
     /**
-     * KOnstruktor klasy Task
+     * Konstruktor klasy Task
      * @param number_task - numer zadania
      * @param duration - czas trwania
      * @param machine_number - numer maszyny
-     * @param part_number - numer części zadania
+     * @param task_name - nazwa zadania (part1, part2, maintanance)
      */
-    public Task(int number_task, int duration, byte machine_number, byte part_number) {
+    public Task(int number_task, int duration, byte machine_number, String task_name) {
         this.number_task = number_task;
         this.duration = duration;
         this.machine_number = machine_number;
-        this.part_number = part_number;
+        this.task_name = task_name;
     }
 
     public abstract int getTime_delay();
@@ -58,11 +57,11 @@ public abstract class Task extends SolutionElement{
         this.machine_number = machine_number;
     }
 
-    public byte getPart_number() {
-        return part_number;
+    public String getTask_name() {
+        return task_name;
     }
 
-    public void setPart_number(byte part_number) {
-        this.part_number = part_number;
+    public void setTask_name(String task_name) {
+        this.task_name = task_name;
     }
 }
