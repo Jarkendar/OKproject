@@ -15,4 +15,6 @@ public class PartSecond extends Task {
     public PartSecond(int number_task, int duration, byte machine_number, byte part_number) {
         super(number_task, duration, machine_number, part_number);
     }
+
+    public int getTime_delay(){ return 0;}
 }

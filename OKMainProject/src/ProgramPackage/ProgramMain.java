@@ -37,7 +37,7 @@ public class ProgramMain {
             if (x.getPart_number() == 1) {
                 System.out.println("Numer zadania " + x.getNumber_task() + "; numer operacji " + x.getPart_number()
                         + "; czas operacji : " + x.getDuration() + "; numer maszyny : "+ x.getMachine_number()
-                        + "; czas opóźnienia : "+ x.getTime_start());
+                        + "; czas opóźnienia : "+ x.getTime_delay());
             }else{
                 System.out.println("Numer zadania " + x.getNumber_task() + "; numer operacji " + x.getPart_number()
                         + "; czas operacji : " + x.getDuration() + "; numer maszyny : "+ x.getMachine_number());
@@ -83,12 +83,16 @@ public class ProgramMain {
             String tmp = scanner.nextLine();
             String[] strings_array = null;
             strings_array = tmp.split(";");
+
             System.out.println(strings_array[0] + " " +strings_array[1] + " "
-                    +strings_array[2] + " " +strings_array[3] + " "+ strings_array[4]);
-            PartFirst partFirst = new PartFirst(i, Integer.parseInt(strings_array[0]),
-                    Byte.parseByte(strings_array[2]), (byte) 1, Integer.parseInt(strings_array[4]));
-            PartSecond partSecond = new PartSecond(i, Integer.parseInt(strings_array[1]),
-                    Byte.parseByte(strings_array[3]), (byte) 2);
+                    +strings_array[2] + " " +strings_array[3] + " " + strings_array[4]);
+            System.out.println(Integer.parseInt(strings_array[0]) + " " + Integer.parseInt(strings_array[1])+ " "
+                    +Byte.parseByte(strings_array[2]) + " " + Byte.parseByte(strings_array[3]) + " "+ Integer.parseInt(strings_array[4]));
+
+            PartFirst partFirst = new PartFirst((i+1), Integer.parseInt(strings_array[0]), Byte.parseByte(strings_array[2])
+                    , ((byte)1), Integer.parseInt(strings_array[4]));
+            PartSecond partSecond = new PartSecond((i+1), Integer.parseInt(strings_array[1]), Byte.parseByte(strings_array[3])
+                    , ((byte)2));
             tasks[i] = partFirst;
             tasks[i+count_objects] = partSecond;
         }

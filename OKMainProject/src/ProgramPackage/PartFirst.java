@@ -7,15 +7,15 @@ public class PartFirst extends Task {
     private int time_delay;
 
     /**
-     * Konstruktor klasy PartFirst z czasem opóźnienia pierwszego zadania.
+     * Konstruktor klasy PartFirst
      * @param number_task
      * @param duration
      * @param machine_number
      * @param part_number
-     * @param time_delay - czas opóźnienia
+     * @param time_delay
      */
     public PartFirst(int number_task, int duration, byte machine_number, byte part_number, int time_delay) {
-        super(number_task, duration, part_number, machine_number);
+        super(number_task, duration, machine_number, part_number);
         this.time_delay = time_delay;
     }
 

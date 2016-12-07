@@ -24,6 +24,8 @@ public abstract class Task extends SolutionElement{
         this.part_number = part_number;
     }
 
+    public abstract int getTime_delay();
+
     public int getNumber_task() {
         return number_task;
     }
