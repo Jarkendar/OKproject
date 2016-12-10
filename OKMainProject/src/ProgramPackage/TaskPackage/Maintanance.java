@@ -1,4 +1,4 @@
-package ProgramPackage;
+package ProgramPackage.TaskPackage;
 
 /**
  * Created by Jarek on 2016-12-06.
