@@ -7,7 +7,6 @@ import ProgramPackage.TaskPackage.Task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
@@ -65,7 +64,6 @@ public class ProgramMain {
     private static void generatorRandomSolution(Task[] tasks, Maintanance[] maintanances) {
         LinkedList<Task> machine1 = new LinkedList<>();
         LinkedList<Task> machine2 = new LinkedList<>();
-
         /**
          * Uwzględnienie wszystkich przerw w rozwiązaniu
          */
@@ -98,10 +96,6 @@ public class ProgramMain {
 
         for (int i = 0; i < tasks.length; i++) {
             int number_on_list = 0;
-            if (tasks[i].getNumber_task() == 5){
-                System.out.println("5" + i);
-            }
-
             /**
              * Na maszynie numer 1
              */
@@ -124,9 +118,45 @@ public class ProgramMain {
                                 tasks[i].setTime_start(machine1.get(k).getTime_start() + machine1.get(k).getDuration());
                                 machine1.addLast(tasks[i]);
                                 break;
-                            } else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start() + machine1.get(k).getDuration()))
+                            } else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start()
+                                    + machine1.get(k).getDuration()))
                                     >= (tasks[i].getDuration())) {
                                 tasks[i].setTime_start(machine1.get(k).getTime_delay() + machine1.get(k).getDuration());
+                                machine1.add(number_on_list, tasks[i]);
+                                break;
+                            } else {
+                                number_on_list++;
+                            }
+                        }
+                    }else if(tasks[i].getTask_name().equals("part2")){
+                        boolean check = false;
+                        Task tmp = null;
+                        for (int k = 0; k < machine1.size(); k++) {
+                            if (machine1.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
+                                tmp = machine1.get(k);
+                                break;
+                            }
+                            check = true;
+                        }
+                        while (check) {
+                            for (int k = 0; k < machine2.size(); k++) {
+                                if (machine2.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
+                                    tmp = machine2.get(k);
+                                    break;
+                                }
+                            }
+                            check = false;
+                        }
+                        for (int k = 0; k < machine1.size(); k++) {
+                            if (machine1.get(k).getTime_start() + machine1.get(k).getDuration() < tmp.getTime_start() + tmp.getDuration()) {
+                                number_on_list++;
+                            } else if (k == machine1.size()-1) {
+                                tasks[i].setTime_start(machine1.get(k).getTime_start() + machine1.get(k).getDuration());
+                                machine1.addLast(tasks[i]);
+                                break;
+                            } else if ((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start() + machine1.get(k).getDuration())
+                                    >= (tasks[i].getDuration())) {
+                                tasks[i].setTime_start(machine1.get(k).getTime_start() + machine1.get(k).getDuration());
                                 machine1.add(number_on_list, tasks[i]);
                                 break;
                             } else {
@@ -157,9 +187,45 @@ public class ProgramMain {
                             tasks[i].setTime_start(machine2.get(k).getTime_start() + machine2.get(k).getDuration());
                             machine2.addLast(tasks[i]);
                             break;
-                        } else if (((machine2.get(k + 1).getTime_start()) - (machine2.get(k).getTime_start() + machine2.get(k).getDuration()))
+                        } else if (((machine2.get(k + 1).getTime_start()) - (machine2.get(k).getTime_start()
+                                + machine2.get(k).getDuration()))
                                 >= (tasks[i].getDuration())) {
-                            tasks[i].setTime_start(machine2.get(k).getTime_delay() + machine2.get(k).getDuration());
+                            tasks[i].setTime_start(machine2.get(k).getTime_start() + machine2.get(k).getDuration());
+                            machine2.add(number_on_list, tasks[i]);
+                            break;
+                        } else {
+                            number_on_list++;
+                        }
+                    }
+                }else if(tasks[i].getTask_name().equals("part2")){
+                    boolean check = false;
+                    Task tmp = null;
+                    for (int k = 0; k < machine1.size(); k++) {
+                        if (machine1.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
+                            tmp = machine1.get(k);
+                            break;
+                        }
+                        check = true;
+                    }
+                    while (check) {
+                        for (int k = 0; k < machine2.size(); k++) {
+                            if (machine2.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
+                                tmp = machine2.get(k);
+                                break;
+                            }
+                        }
+                        check = false;
+                    }
+                    for (int k = 0; k < machine2.size(); k++) {
+                        if (machine2.get(k).getTime_start() + machine2.get(k).getDuration() < tmp.getTime_start() + tmp.getDuration()) {
+                            number_on_list++;
+                        } else if (k == machine2.size()-1) {
+                            tasks[i].setTime_start(machine2.get(k).getTime_start() + machine2.get(k).getDuration());
+                            machine2.addLast(tasks[i]);
+                            break;
+                        } else if ((machine2.get(k + 1).getTime_start()) - (machine2.get(k).getTime_start() + machine2.get(k).getDuration())
+                                >= (tasks[i].getDuration())) {
+                            tasks[i].setTime_start(machine2.get(k).getTime_start() + machine2.get(k).getDuration());
                             machine2.add(number_on_list, tasks[i]);
                             break;
                         } else {
