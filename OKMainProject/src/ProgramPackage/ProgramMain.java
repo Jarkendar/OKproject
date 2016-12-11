@@ -38,7 +38,17 @@ public class ProgramMain {
 
         displayTest(maintanances,tasks);
 
-        generatorRandomSolution(tasks,maintanances);
+        /**
+         * Tworzenie instancji wejściowych i wypełnieniej jej losowymi rozwiązaniami
+         */
+        Solution[] solutions = new Solution[10];
+        for (int i =0; i<10; i++){
+            Task[] tasks_clone = tasks.clone();
+            Maintanance[] maintanances_clone = maintanances.clone();
+            System.out.println("Numer instacji " + (i+1));
+            solutions[i] = generatorRandomSolution(tasks_clone,maintanances_clone);
+            System.out.println("Czas funkcji celu : "+ solutions[i].getFunction_target());
+        }
     }
 
     /**
@@ -76,7 +86,13 @@ public class ProgramMain {
     }
 
 
-    private static void generatorRandomSolution(Task[] tasks, Maintanance[] maintanances) {
+    /**
+     * Metoda generuje losowe rozwiązania, potrzebne algorytmowi mrówkowemu przy rozpoczęciu prac.
+     * @param tasks - tablica zadań
+     * @param maintanances - tablica przerw
+     * @return - zwraca obiekt Solution zawierający przykładowe rozwiązanie
+     */
+    private static Solution generatorRandomSolution(Task[] tasks, Maintanance[] maintanances) {
         LinkedList<Task> machine1 = new LinkedList<>();
         LinkedList<Task> machine2 = new LinkedList<>();
         Random random = new Random(System.currentTimeMillis());
@@ -290,6 +306,8 @@ public class ProgramMain {
             }
         }
         dislpaySolution(machine1,machine2);
+        Solution solution = new Solution(machine1,machine2);
+        return solution;
     }
 
     /**
@@ -298,15 +316,15 @@ public class ProgramMain {
      * @param tasks - tablica zadań
      */
     private static void displayTest(Maintanance[] maintanances, Task[] tasks){
-        for (int i = 0; i<tasks.length; i++){
-            System.out.println("Numer zadania " + tasks[i].getNumber_task() + "; nazwa operacji : " + tasks[i].getTask_name()
-                    + "; czas operacji : " + tasks[i].getDuration() + "; numer maszyny : "+ tasks[i].getMachine_number()
-                    + "; czas opóźnienia : "+ tasks[i].getTime_delay());
+        for (Task task : tasks) {
+            System.out.println("Numer zadania " + task.getNumber_task() + "; nazwa operacji : " + task.getTask_name()
+                    + "; czas operacji : " + task.getDuration() + "; numer maszyny : " + task.getMachine_number()
+                    + "; czas opóźnienia : " + task.getTime_delay());
         }
-        for (int i = 0; i<maintanances.length; i++){
-            System.out.println("Numer przerwy " + maintanances[i].getNumber_task() + "; nazwa operacji : " + maintanances[i].getTask_name()
-                    + "; czas przerwy : " + maintanances[i].getDuration() + "; numer maszyny : "+ maintanances[i].getMachine_number()
-                    + "; czas opóźnienia : "+ maintanances[i].getTime_delay());
+        for (Maintanance maintanance : maintanances) {
+            System.out.println("Numer przerwy " + maintanance.getNumber_task() + "; nazwa operacji : " + maintanance.getTask_name()
+                    + "; czas przerwy : " + maintanance.getDuration() + "; numer maszyny : " + maintanance.getMachine_number()
+                    + "; czas opóźnienia : " + maintanance.getTime_delay());
         }
 
     }
