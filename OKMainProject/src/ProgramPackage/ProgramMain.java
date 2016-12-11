@@ -38,26 +38,16 @@ public class ProgramMain {
 
         displayTest(maintanances,tasks);
 
-        generatorRandomSolution(tasks,maintanances);
-    }
-
-    /**
-     * Wyświetlenie wynikowych list
-     * @param machine1
-     * @param machine2
-     */
-    private static void dislpaySolution(LinkedList<Task> machine1, LinkedList<Task> machine2){
-        System.out.println("Maszyna nr 1");
-        for (Task x: machine1){
-            System.out.println("nazwa operacji : " + x.getTask_name() + " " + x.getNumber_task()
-                    + " ; czas pracy : " + x.getTime_start()
-                    + " - " + (x.getTime_start()+x.getDuration()));
-        }
-        System.out.println("Maszyna nr 2");
-        for (Task x: machine2){
-            System.out.println("nazwa operacji : " + x.getTask_name() + " " + x.getNumber_task()
-                    + " ; czas pracy : " + x.getTime_start()
-                    + " - " + (x.getTime_start()+x.getDuration()));
+        /**
+         * Tworzenie instancji wejściowych i wypełnieniej jej losowymi rozwiązaniami
+         */
+        Solution[] solutions = new Solution[10];
+        for (int i =0; i<10; i++){
+            Task[] tasks_clone = tasks.clone();
+            Maintanance[] maintanances_clone = maintanances.clone();
+            System.out.println("Numer instacji " + (i+1));
+            solutions[i] = generatorRandomSolution(tasks_clone,maintanances_clone);
+            System.out.println("Czas funkcji celu : "+ solutions[i].getFunction_target());
         }
     }
 
@@ -76,10 +66,16 @@ public class ProgramMain {
     }
 
 
-    private static void generatorRandomSolution(Task[] tasks, Maintanance[] maintanances) {
+    /**
+     * Metoda generuje losowe rozwiązania, potrzebne algorytmowi mrówkowemu przy rozpoczęciu prac.
+     * @param tasks - tablica zadań
+     * @param maintanances - tablica przerw
+     * @return - zwraca obiekt Solution zawierający przykładowe rozwiązanie
+     */
+    private static Solution generatorRandomSolution(Task[] tasks, Maintanance[] maintanances) {
         LinkedList<Task> machine1 = new LinkedList<>();
         LinkedList<Task> machine2 = new LinkedList<>();
-        Random random = new Random(System.currentTimeMillis());
+
         /**
          * Uwzględnienie wszystkich przerw w rozwiązaniu
          */
@@ -108,14 +104,12 @@ public class ProgramMain {
                 machine2.add(number_on_list, maintanances[i]);
             }
         }
-        dislpaySolution(machine1, machine2);
 
         boolean[] tasks_uses_test = new boolean[tasks.length];
-        for (boolean x : tasks_uses_test){
-            x = false;
-        }
+        for (int i = 0 ; i< tasks_uses_test.length; i++) tasks_uses_test[i] = false;
 
         while (checkAllTasksWasUses(tasks_uses_test)) {
+            Random random = new Random(System.currentTimeMillis());
             int number_on_list = 0;
             int choose_task_from_array = random.nextInt(tasks.length);
             /**
@@ -160,23 +154,23 @@ public class ProgramMain {
                             }
                         }
                     } else if (tasks[choose_task_from_array].getTask_name().equals("part2")) {
-                        boolean check = false;
+                        boolean check = true;
                         Task tmp = null;
                         for (int k = 0; k < machine1.size(); k++) {
                             if (machine1.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
                                 tmp = machine1.get(k);
+                                check = false;
                                 break;
                             }
-                            check = true;
                         }
                         while (check) {
                             for (int k = 0; k < machine2.size(); k++) {
                                 if (machine2.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
                                     tmp = machine2.get(k);
+                                    check = false;
                                     break;
                                 }
                             }
-                            check = false;
                         }
                         if (tmp != null) {
                             for (int k = 0; k < machine1.size(); k++) {
@@ -205,7 +199,7 @@ public class ProgramMain {
                 /**
                  * Na maszynie numer 2
                  */
-                if (tasks[choose_task_from_array].getMachine_number() == 2) {
+                else if (tasks[choose_task_from_array].getMachine_number() == 2) {
                     /**
                      * Część pierwsza zadania
                      */
@@ -243,23 +237,23 @@ public class ProgramMain {
                             }
                         }
                     } else if (tasks[choose_task_from_array].getTask_name().equals("part2")) {
-                        boolean check = false;
+                        boolean check = true;
                         Task tmp = null;
                         for (int k = 0; k < machine1.size(); k++) {
                             if (machine1.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
                                 tmp = machine1.get(k);
+                                check = false;
                                 break;
                             }
-                            check = true;
                         }
                         while (check) {
                             for (int k = 0; k < machine2.size(); k++) {
                                 if (machine2.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
                                     tmp = machine2.get(k);
+                                    check = false;
                                     break;
                                 }
                             }
-                            check = false;
                         }
                         if (tmp != null) {
                             for (int k = 0; k < machine2.size(); k++) {
@@ -289,7 +283,11 @@ public class ProgramMain {
                 }
             }
         }
-        dislpaySolution(machine1,machine2);
+        Solution solution = new Solution(machine1,machine2);
+        solution.displayMachine1();
+        solution.displayMachine2();
+        solution.setFunction_target();
+        return solution;
     }
 
     /**
@@ -298,15 +296,15 @@ public class ProgramMain {
      * @param tasks - tablica zadań
      */
     private static void displayTest(Maintanance[] maintanances, Task[] tasks){
-        for (int i = 0; i<tasks.length; i++){
-            System.out.println("Numer zadania " + tasks[i].getNumber_task() + "; nazwa operacji : " + tasks[i].getTask_name()
-                    + "; czas operacji : " + tasks[i].getDuration() + "; numer maszyny : "+ tasks[i].getMachine_number()
-                    + "; czas opóźnienia : "+ tasks[i].getTime_delay());
+        for (Task task : tasks) {
+            System.out.println("Numer zadania " + task.getNumber_task() + "; nazwa operacji : " + task.getTask_name()
+                    + "; czas operacji : " + task.getDuration() + "; numer maszyny : " + task.getMachine_number()
+                    + "; czas opóźnienia : " + task.getTime_delay());
         }
-        for (int i = 0; i<maintanances.length; i++){
-            System.out.println("Numer przerwy " + maintanances[i].getNumber_task() + "; nazwa operacji : " + maintanances[i].getTask_name()
-                    + "; czas przerwy : " + maintanances[i].getDuration() + "; numer maszyny : "+ maintanances[i].getMachine_number()
-                    + "; czas opóźnienia : "+ maintanances[i].getTime_delay());
+        for (Maintanance maintanance : maintanances) {
+            System.out.println("Numer przerwy " + maintanance.getNumber_task() + "; nazwa operacji : " + maintanance.getTask_name()
+                    + "; czas przerwy : " + maintanance.getDuration() + "; numer maszyny : " + maintanance.getMachine_number()
+                    + "; czas opóźnienia : " + maintanance.getTime_delay());
         }
 
     }
