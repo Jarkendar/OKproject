@@ -124,7 +124,6 @@ public class ProgramMain {
                 machine2.add(number_on_list, maintanances[i]);
             }
         }
-        dislpaySolution(machine1, machine2);
 
         boolean[] tasks_uses_test = new boolean[tasks.length];
         for (boolean x : tasks_uses_test){
@@ -305,8 +304,10 @@ public class ProgramMain {
                 }
             }
         }
-        dislpaySolution(machine1,machine2);
         Solution solution = new Solution(machine1,machine2);
+        solution.displayMachine1();
+        solution.displayMachine2();
+        solution.setFunction_target();
         return solution;
     }
 

@@ -21,11 +21,30 @@ public class Solution {
     public Solution(LinkedList<Task> machine1, LinkedList<Task> machine2) {
         this.machine1 = machine1;
         this.machine2 = machine2;
-        setFunction_target();
+
     }
 
     public int getFunction_target() {
         return function_target;
+    }
+
+    public void displayMachine1(){
+        System.out.println("Maszyna nr 1");
+        for (Task x: machine1){
+            System.out.println("nazwa operacji : " + x.getTask_name() + " " + x.getNumber_task()
+                    + " ; czas pracy : " + x.getTime_start()
+                    + " - " + (x.getTime_start()+x.getDuration()));
+        }
+    }
+
+    public void displayMachine2(){
+        System.out.println("Maszyna nr 2");
+        for (Task x: machine2){
+            System.out.println("nazwa operacji : " + x.getTask_name() + " " + x.getNumber_task()
+                    + " ; czas pracy : " + x.getTime_start()
+                    + " - " + (x.getTime_start()+x.getDuration()));
+        }
+
     }
 
     /**
@@ -33,8 +52,8 @@ public class Solution {
      */
     public void setFunction_target() {
 
-        int m1_end_time = machine1.getLast().getTime_start() + machine1.getLast().getTime_delay();
-        int m2_end_time = machine2.getLast().getTime_start() + machine2.getLast().getTime_delay();
+        int m1_end_time = machine1.getLast().getTime_start() + machine1.getLast().getDuration();
+        int m2_end_time = machine2.getLast().getTime_start() + machine2.getLast().getDuration();
 
         if (m1_end_time > m2_end_time) {
             this.function_target = m1_end_time;
