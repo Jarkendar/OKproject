@@ -108,30 +108,50 @@ public class ProgramMain {
         boolean[] tasks_uses_test = new boolean[tasks.length];
         for (int i = 0 ; i< tasks_uses_test.length; i++) tasks_uses_test[i] = false;
 
+        Random random = new Random(System.currentTimeMillis());
 
         while (checkAllTasksWasUses(tasks_uses_test)) {
-            Random random = new Random(System.currentTimeMillis());
+
             int number_on_list = 0;
             int choose_task_from_array = random.nextInt(tasks.length);
+            System.out.println("Numer wylosowany " + choose_task_from_array);
 
             /**
              * Na maszynie numer 1
              */
             if (!tasks_uses_test[choose_task_from_array]) {
+
+                System.out.println("Warunek użycia zadania.");
+
                 if (tasks[choose_task_from_array].getMachine_number() == 1) {
+
+                    System.out.println("Warunek maszyny = maszyna 1");
+
                     /**
                      * Część pierwsza zadania
                      */
                     if (tasks[choose_task_from_array].getTask_name().equals("part1")) {
+
+                        System.out.println("Warunek części pierwszej na maszynie 1 " + machine1.size());
+
                         /**
                          * Sprawdzanie miejsca wstawienia w listę
                          */
+                        if (machine1.size() == 0){
+                            tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
+                            tasks_uses_test[choose_task_from_array] == true;
+                            machine1.add(tasks[choose_task_from_array]);
+                        }
+
                         for (int k = 0; k < machine1.size(); k++) {
                             /**
                              * Jeśli część pierwsza zmieści się przed pierwszym zadaniem umieszczonym już w rozwiązaniu.
                              */
                             if (k == 0 && machine1.get(0).getTime_start() >= tasks[choose_task_from_array].getDuration()
                                     + tasks[choose_task_from_array].getTime_delay()) {
+
+                                System.out.println("Warunek zmieszczenia się na pierwszym miejscu");
+
                                 tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
                                 machine1.add(0, tasks[choose_task_from_array]);
                                 tasks_uses_test[choose_task_from_array] = true;
@@ -142,20 +162,32 @@ public class ProgramMain {
                              */
                             if ((machine1.get(k).getTime_start() + machine1.get(k).getDuration())
                                     < tasks[choose_task_from_array].getTime_delay()) {
+
+                                System.out.println("Warunek czasu opóźnienia większego od zakończenia się zadania na maszynie");
+
                                 number_on_list++;
                             }
                             /**
                              * Jeśli maszyna jest ustawiona na ostatnie zadanie
                              */
                             else if (k == machine1.size() - 1 || number_on_list >= machine1.size()) {
+
+                                System.out.println("Warunek ustawienia na ostatni element maszyny");
+
                                 /**
                                  * Jeśli czas opóźnienia części pierwszej jest większy od czasu zakończenia ostatniego zadania
                                  * to ustaw czas rozpoczęcia zadania na czas opóźnienia.
                                  */
                                 if(tasks[choose_task_from_array].getTime_delay()
                                         > machine1.getLast().getTime_start() + machine1.getLast().getDuration()){
+
+                                    System.out.println(1);
+
                                     tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
                                 }else {
+
+                                    System.out.println(2);
+
                                     tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
                                             + machine1.get(k).getDuration());
                                 }
@@ -169,6 +201,9 @@ public class ProgramMain {
                             else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start()
                                     + machine1.get(k).getDuration()))
                                     >= (tasks[choose_task_from_array].getDuration())) {
+
+                                System.out.println("część zadania zmieści się pomiędzy dwa zadania na maszynie.");
+
                                 tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
                                         + machine1.get(k).getDuration());
                                 machine1.add(number_on_list+1, tasks[choose_task_from_array]);
@@ -181,10 +216,14 @@ public class ProgramMain {
                             else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start()
                                     + machine1.get(k).getDuration()))
                                     < (tasks[choose_task_from_array].getDuration())){
+
+                                System.out.println("część zadania nie zmieści się pomiędzy dwa zadania na maszynie.");
+
                                 number_on_list++;
-                            }else {
-                                number_on_list++;
+                            } else{
+                                System.out.println("error");
                             }
+                            System.out.println(k);
                         }
                     } else if (tasks[choose_task_from_array].getTask_name().equals("part2")) {
                         /**
