@@ -108,10 +108,12 @@ public class ProgramMain {
         boolean[] tasks_uses_test = new boolean[tasks.length];
         for (int i = 0 ; i< tasks_uses_test.length; i++) tasks_uses_test[i] = false;
 
+
         while (checkAllTasksWasUses(tasks_uses_test)) {
             Random random = new Random(System.currentTimeMillis());
             int number_on_list = 0;
             int choose_task_from_array = random.nextInt(tasks.length);
+
             /**
              * Na maszynie numer 1
              */
@@ -125,6 +127,9 @@ public class ProgramMain {
                          * Sprawdzanie miejsca wstawienia w listę
                          */
                         for (int k = 0; k < machine1.size(); k++) {
+                            /**
+                             * Jeśli część pierwsza zmieści się przed pierwszym zadaniem umieszczonym już w rozwiązaniu.
+                             */
                             if (k == 0 && machine1.get(0).getTime_start() >= tasks[choose_task_from_array].getDuration()
                                     + tasks[choose_task_from_array].getTime_delay()) {
                                 tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
@@ -132,64 +137,105 @@ public class ProgramMain {
                                 tasks_uses_test[choose_task_from_array] = true;
                                 break;
                             }
+                            /**
+                             * Jeśli opóźnienie części pierwszej jest większe od zakończenia się zadania to zwiększaj miejsce w liście
+                             */
                             if ((machine1.get(k).getTime_start() + machine1.get(k).getDuration())
                                     < tasks[choose_task_from_array].getTime_delay()) {
                                 number_on_list++;
-                            } else if (k == machine1.size() - 1) {
-                                tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
-                                        + machine1.get(k).getDuration());
+                            }
+                            /**
+                             * Jeśli maszyna jest ustawiona na ostatnie zadanie
+                             */
+                            else if (k == machine1.size() - 1 || number_on_list >= machine1.size()) {
+                                /**
+                                 * Jeśli czas opóźnienia części pierwszej jest większy od czasu zakończenia ostatniego zadania
+                                 * to ustaw czas rozpoczęcia zadania na czas opóźnienia.
+                                 */
+                                if(tasks[choose_task_from_array].getTime_delay()
+                                        > machine1.getLast().getTime_start() + machine1.getLast().getDuration()){
+                                    tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
+                                }else {
+                                    tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
+                                            + machine1.get(k).getDuration());
+                                }
                                 machine1.addLast(tasks[choose_task_from_array]);
                                 tasks_uses_test[choose_task_from_array] = true;
                                 break;
-                            } else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start()
+                            }
+                            /**
+                             * Jeśli część zadania zmieści się pomiędzy dwa zadania na maszynie.
+                             */
+                            else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start()
                                     + machine1.get(k).getDuration()))
                                     >= (tasks[choose_task_from_array].getDuration())) {
-                                tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_delay()
+                                tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
                                         + machine1.get(k).getDuration());
                                 machine1.add(number_on_list+1, tasks[choose_task_from_array]);
                                 tasks_uses_test[choose_task_from_array] = true;
                                 break;
-                            } else {
+                            }
+                            /**
+                             * Jeśli część zadania nie zmieści się pomiędzy dwa zadania na maszynie.
+                             */
+                            else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start()
+                                    + machine1.get(k).getDuration()))
+                                    < (tasks[choose_task_from_array].getDuration())){
+                                number_on_list++;
+                            }else {
                                 number_on_list++;
                             }
                         }
                     } else if (tasks[choose_task_from_array].getTask_name().equals("part2")) {
-                        boolean check = true;
-                        Task tmp = null;
-                        for (int k = 0; k < machine1.size(); k++) {
-                            if (machine1.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
-                                tmp = machine1.get(k);
-                                check = false;
-                                break;
-                            }
-                        }
-                        while (check) {
-                            for (int k = 0; k < machine2.size(); k++) {
-                                if (machine2.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
-                                    tmp = machine2.get(k);
-                                    check = false;
-                                    break;
-                                }
-                            }
-                        }
+                        /**
+                         * Wyszukanie czy część pierwsza została zrealizowana
+                         */
+                        Task tmp = checkPartFirst(machine1,machine2,tasks[choose_task_from_array].getNumber_task());
                         if (tmp != null) {
                             for (int k = 0; k < machine1.size(); k++) {
+                                /**
+                                 * Jeśli czas zakończenia zadania na maszynie jest mniejszy od "czasu opóźnienia" części drugiej
+                                 */
                                 if (machine1.get(k).getTime_start() + machine1.get(k).getDuration() < tmp.getTime_start()
                                         + tmp.getDuration()) {
                                     number_on_list++;
-                                } else if (k == machine1.size() - 1) {
-                                    tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
-                                            + machine1.get(k).getDuration());
+                                }
+                                /**
+                                 * Jeśli jest ustawiona na ostatnie zadanie.
+                                 */
+                                else if (k == machine1.size() - 1 || number_on_list >= machine1.size()) {
+                                    /**
+                                     * Jeśli czas opóźnienia drugiego zadania jest mniejszy od zakończenia się zadania ostatniego
+                                     * to ustaw czas opóźnienia jako start.
+                                     */
+                                    if(tmp.getTime_start()+tmp.getDuration()
+                                            > machine1.getLast().getTime_start() + machine1.getLast().getDuration()){
+                                        tasks[choose_task_from_array].setTime_start(tmp.getTime_start()+tmp.getDuration());
+                                    }else {
+                                        tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start()
+                                                + machine1.get(k).getDuration());
+                                    }
                                     machine1.addLast(tasks[choose_task_from_array]);
                                     tasks_uses_test[choose_task_from_array] = true;
                                     break;
-                                } else if ((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start() + machine1.get(k).getDuration())
+                                }
+                                /**
+                                 *Jeśli zadanie się zmieści pomiędzy dwoma na maszynie.
+                                 */
+                                else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start() + machine1.get(k).getDuration()))
                                         >= (tasks[choose_task_from_array].getDuration())) {
                                     tasks[choose_task_from_array].setTime_start(machine1.get(k).getTime_start() + machine1.get(k).getDuration());
                                     machine1.add(number_on_list+1, tasks[choose_task_from_array]);
                                     tasks_uses_test[choose_task_from_array] = true;
                                     break;
-                                } else {
+                                }
+                                /**
+                                 * Jeśli zadanie sie nie zmieści pomiędzy zadaniami na maszynie.
+                                 */
+                                else if (((machine1.get(k + 1).getTime_start()) - (machine1.get(k).getTime_start() + machine1.get(k).getDuration()))
+                                        < (tasks[choose_task_from_array].getDuration())){
+                                    number_on_list++;
+                                }else {
                                     number_on_list++;
                                 }
                             }
@@ -208,6 +254,9 @@ public class ProgramMain {
                          * Sprawdzanie miejsca wstawienia w listę
                          */
                         for (int k = 0; k < machine2.size(); k++) {
+                            /**
+                             * Jeśli zadanie zmieści się przed pierwszym zadaniem umieszczonym na maszynie.
+                             */
                             if (k == 0 && machine2.get(0).getTime_start() >= tasks[choose_task_from_array].getDuration()
                                     + tasks[choose_task_from_array].getTime_delay()) {
                                 tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
@@ -215,16 +264,35 @@ public class ProgramMain {
                                 tasks_uses_test[choose_task_from_array] = true;
                                 break;
                             }
+                            /**
+                             * Jeśli czas zakończenia kolejnych zadań na maszynie jest większy od czasu opóźnienia.
+                             */
                             if ((machine2.get(k).getTime_start() + machine2.get(k).getDuration())
                                     < tasks[choose_task_from_array].getTime_delay()) {
                                 number_on_list++;
-                            } else if (k == machine2.size() - 1) {
-                                tasks[choose_task_from_array].setTime_start(machine2.get(k).getTime_start()
-                                        + machine2.get(k).getDuration());
+                            }
+                            /**
+                             * Jeśli maszyna jest ustawiona na ostatnie zadanie.
+                             */
+                            else if (k == machine2.size() - 1 || number_on_list >= machine2.size()) {
+                                /**
+                                 * Jeśli czas opóźnienia zadania jest większy od czasu zakończenia się ostatniego zadania na maszynie
+                                 */
+                                if ((machine2.getLast().getTime_start()+machine2.getLast().getDuration())
+                                        < tasks[choose_task_from_array].getTime_delay()){
+                                    tasks[choose_task_from_array].setTime_start(tasks[choose_task_from_array].getTime_delay());
+                                } else {
+                                    tasks[choose_task_from_array].setTime_start(machine2.get(k).getTime_start()
+                                            + machine2.get(k).getDuration());
+                                }
                                 machine2.addLast(tasks[choose_task_from_array]);
                                 tasks_uses_test[choose_task_from_array] = true;
                                 break;
-                            } else if (((machine2.get(k + 1).getTime_start()) - (machine2.get(k).getTime_start()
+                            }
+                            /**
+                             * Jeśli zadanie zmieści się pomiedzy dwa zadania umieszczone na maszynie.
+                             */
+                            else if (((machine2.get(k + 1).getTime_start()) - (machine2.get(k).getTime_start()
                                     + machine2.get(k).getDuration()))
                                     >= (tasks[choose_task_from_array].getDuration())) {
                                 tasks[choose_task_from_array].setTime_start(machine2.get(k).getTime_start()
@@ -232,41 +300,55 @@ public class ProgramMain {
                                 machine2.add(number_on_list+1, tasks[choose_task_from_array]);
                                 tasks_uses_test[choose_task_from_array] = true;
                                 break;
-                            } else {
+                            }
+                            /**
+                             * Jeśli zadanie nie zmieści się pomiędzy dwa zadania umieszczone na maszynie.
+                             */
+                            else if(((machine2.get(k + 1).getTime_start()) - (machine2.get(k).getTime_start()
+                                    + machine2.get(k).getDuration()))
+                                    < (tasks[choose_task_from_array].getDuration())){
+                                number_on_list++;
+                            }else {
                                 number_on_list++;
                             }
                         }
                     } else if (tasks[choose_task_from_array].getTask_name().equals("part2")) {
-                        boolean check = true;
-                        Task tmp = null;
-                        for (int k = 0; k < machine1.size(); k++) {
-                            if (machine1.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
-                                tmp = machine1.get(k);
-                                check = false;
-                                break;
-                            }
-                        }
-                        while (check) {
-                            for (int k = 0; k < machine2.size(); k++) {
-                                if (machine2.get(k).getNumber_task() == tasks[k].getNumber_task() && tasks[k].getTask_name().equals("part1")) {
-                                    tmp = machine2.get(k);
-                                    check = false;
-                                    break;
-                                }
-                            }
-                        }
+                        /**
+                         * Wyszukanie czy część pierwsza została zrealizowana
+                         */
+                        Task tmp = checkPartFirst(machine1,machine2,tasks[choose_task_from_array].getNumber_task());
                         if (tmp != null) {
                             for (int k = 0; k < machine2.size(); k++) {
+                                /**
+                                 * Jeśli czas opóźnienia części drugiej jest większy od czasu zakończenia się zadania na maszynie.
+                                 */
                                 if (machine2.get(k).getTime_start() + machine2.get(k).getDuration()
                                         < tmp.getTime_start() + tmp.getDuration()) {
                                     number_on_list++;
-                                } else if (k == machine2.size() - 1) {
-                                    tasks[choose_task_from_array].setTime_start(machine2.get(k).getTime_start()
-                                            + machine2.get(k).getDuration());
+                                }
+                                /**
+                                 * Jeśli maszyna ustawiona jest na ostatnie zadanie.
+                                 */
+                                else if (k == machine2.size() - 1 || number_on_list >= machine2.size()) {
+                                    /**
+                                     * Jeśli czas opóźnienia drugiego zadania jest mniejszy od zakończenia się zadania ostatniego
+                                     * to ustaw czas opóźnienia jako start.
+                                     */
+                                    if(tmp.getTime_start()+tmp.getDuration()
+                                            > machine2.getLast().getTime_start() + machine2.getLast().getDuration()){
+                                        tasks[choose_task_from_array].setTime_start(tmp.getTime_start()+tmp.getDuration());
+                                    }else {
+                                        tasks[choose_task_from_array].setTime_start(machine2.get(k).getTime_start()
+                                                + machine2.get(k).getDuration());
+                                    }
                                     machine2.addLast(tasks[choose_task_from_array]);
                                     tasks_uses_test[choose_task_from_array] = true;
                                     break;
-                                } else if ((machine2.get(k + 1).getTime_start())
+                                }
+                                /**
+                                 * Jeśli zadanie zmieści się pomiędzy dwoma zadaniami na maszynie.
+                                 */
+                                else if ((machine2.get(k + 1).getTime_start())
                                         - (machine2.get(k).getTime_start() + machine2.get(k).getDuration())
                                         >= (tasks[choose_task_from_array].getDuration())) {
                                     tasks[choose_task_from_array].setTime_start(machine2.get(k).getTime_start()
@@ -274,7 +356,15 @@ public class ProgramMain {
                                     machine2.add(number_on_list+1, tasks[choose_task_from_array]);
                                     tasks_uses_test[choose_task_from_array] = true;
                                     break;
-                                } else {
+                                }
+                                /**
+                                 * Jeśli zadanie nie zmieści się pomiędzy dwoma zadaniami na maszynie.
+                                 */
+                                else if ((machine2.get(k + 1).getTime_start())
+                                        - (machine2.get(k).getTime_start() + machine2.get(k).getDuration())
+                                        < (tasks[choose_task_from_array].getDuration())){
+                                    number_on_list++;
+                                }else {
                                     number_on_list++;
                                 }
                             }
@@ -288,6 +378,32 @@ public class ProgramMain {
         solution.displayMachine2();
         solution.setFunction_target();
         return solution;
+    }
+
+    /**
+     * Wyciąga część pierwszą zadania.
+     * @param machine1 - lista maszyny 1
+     * @param machine2 - lista maszyny 2
+     * @param number_task - numer zadania
+     * @return - zwraca obiekt części pierwszej
+     */
+    private static Task checkPartFirst(LinkedList<Task> machine1, LinkedList<Task> machine2, int number_task){
+        /**
+         * Sprawdzenie czy część pierwsza zadania była już na maszynach
+         */
+        for (int k = 0; k < machine1.size(); k++) {
+            if (machine1.get(k).getNumber_task() == number_task && machine1.get(k).getTask_name().equals("part1")) {
+                Task tmp = machine1.get(k);
+                return tmp;
+            }
+        }
+        for (int k = 0; k < machine2.size(); k++) {
+            if (machine2.get(k).getNumber_task() == number_task && machine2.get(k).getTask_name().equals("part1")) {
+                Task tmp = machine2.get(k);
+                return tmp;
+            }
+        }
+        return null;
     }
 
     /**
