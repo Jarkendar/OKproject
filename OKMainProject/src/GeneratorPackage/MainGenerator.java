@@ -142,7 +142,7 @@ public class MainGenerator {
                     nr_mach = 2;
                 }
                 time = random.nextInt(max_time/3) + 1;
-                start_time = random.nextInt(all_time/4);
+                start_time = random.nextInt(all_time/2+1);
             }while(checkMaintananceRepeat(maintanances,nr_mach,time,start_time, i));
 
             Maintanance maintanance = new Maintanance(nr_mach,time,start_time);
