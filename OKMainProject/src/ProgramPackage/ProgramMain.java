@@ -31,17 +31,17 @@ public class ProgramMain {
         count_maintanance = 1 + size/8;
 
 
-//        for (int k = 5; k<=50 ; k+=5) {
-//            size = k;
-//            for (int j =1; j<=100; j++) {
-//                inscance_number = j;
-//
-//                System.out.println("size " + size+ " numer instancji "+ inscance_number);
+        for (int k = 5; k<=50 ; k+=5) {
+            size = k;
+            for (int j =1; j<=100; j++) {
+                inscance_number = j;
+
+                System.out.println("size " + size+ " numer instancji "+ inscance_number);
 
 
                 //tworzenie ścieżki do plików
                 path_to_instance = createPathToInstance(size, inscance_number);
-      //          count_object =size;
+                count_object =size;
                 //wczytanie tablicy zadań i przerw z pliku
                 Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
                 Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
@@ -64,8 +64,8 @@ public class ProgramMain {
                     solutions[i].displayMachine2();
                     solutions[i].setFunction_target();
                     System.out.println("Czas funkcji celu : " + solutions[i].getFunction_target());
-//                }
-//            }
+                }
+            }
         }
     }
 
@@ -83,6 +83,20 @@ public class ProgramMain {
         return false;
     }
 
+    private static void displayTest(LinkedList<Task> machine1, LinkedList<Task> machine2){
+        System.out.println("Maszyna nr 1");
+        for (Task x: machine1){
+            System.out.println("nazwa operacji : " + x.getTask_name() + " " + x.getNumber_task()
+                    + " ; czas pracy : " + x.getTime_start()
+                    + " - " + (x.getTime_start()+x.getDuration()));
+        }
+        System.out.println("Maszyna nr 2");
+        for (Task x: machine2){
+            System.out.println("nazwa operacji : " + x.getTask_name() + " " + x.getNumber_task()
+                    + " ; czas pracy : " + x.getTime_start()
+                    + " - " + (x.getTime_start()+x.getDuration()));
+        }
+    }
 
     private static Solution generatorV2(Task[] tasks, Maintanance[] maintanances){
         LinkedList<Task> machine1 = new LinkedList<>();
@@ -99,17 +113,27 @@ public class ProgramMain {
             int wylosowana = random.nextInt(maintanances.length);
 
             if (!main_uses[wylosowana]){
+                /**
+                 * na maszynie nr 1
+                 */
                 if (maintanances[wylosowana].getMachine_number() == 1){
+                    /**
+                     * jeśli lista jest jeszcze pusta
+                     */
                     if (machine1.size() == 0){
                         maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
                         machine1.addFirst(maintanances[wylosowana]);
                         main_uses[wylosowana] = true;
-                    }else {
+                    }
+                    /**
+                     * jeśli na liście coś jest
+                     */
+                    else {
                         for (int i = 0; i<machine1.size(); i++){
                             /**
                              * Zmieści się przed pierwszym zadaniem.
                              */
-                            if (machine1.get(0).getTime_start() > maintanances[wylosowana].getTime_delay()) {
+                            if (machine1.get(0).getTime_delay() > maintanances[wylosowana].getTime_delay()) {
                                 maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
                                 machine1.addFirst(maintanances[wylosowana]);
                                 main_uses[wylosowana] = true;
@@ -118,7 +142,7 @@ public class ProgramMain {
                             /**
                              * Jeśli zmieści się pomiędzy dwoma zadaniami
                              */
-                            else if (machine1.get(i).getTime_start() > (maintanances[wylosowana].getTime_delay())) {
+                            else if (i < machine1.size()-1 && machine1.get(i).getTime_delay() > (maintanances[wylosowana].getTime_delay())) {
                                 maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
                                 machine1.add(i, maintanances[wylosowana]);
                                 main_uses[wylosowana] = true;
@@ -129,9 +153,15 @@ public class ProgramMain {
                              */
                             else if (i == machine1.size() - 1) {
                                 maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
-                                machine1.addLast(maintanances[wylosowana]);
-                                main_uses[wylosowana] = true;
-                                break;
+                                if (machine1.get(i).getTime_delay() > maintanances[wylosowana].getTime_delay()){
+                                    machine1.add(i, maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }else {
+                                    machine1.addLast(maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -141,11 +171,11 @@ public class ProgramMain {
                         machine2.addFirst(maintanances[wylosowana]);
                         main_uses[wylosowana] = true;
                     }else {
-                        for (int i = 0; i<machine1.size(); i++){
+                        for (int i = 0; i<machine2.size(); i++){
                             /**
                              * Zmieści się przed pierwszym zadaniem.
                              */
-                            if (machine2.get(0).getTime_start() > maintanances[wylosowana].getTime_delay()) {
+                            if (machine2.get(0).getTime_delay() > maintanances[wylosowana].getTime_delay()) {
                                 maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
                                 machine2.addFirst(maintanances[wylosowana]);
                                 main_uses[wylosowana] = true;
@@ -154,7 +184,7 @@ public class ProgramMain {
                             /**
                              * Jeśli zmieści się pomiędzy dwoma zadaniami
                              */
-                            else if (machine2.get(i).getTime_start() > (maintanances[wylosowana].getTime_delay())) {
+                            else if (i < machine2.size()-1 && machine2.get(i).getTime_delay() > (maintanances[wylosowana].getTime_delay())) {
                                 maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
                                 machine2.add(i, maintanances[wylosowana]);
                                 main_uses[wylosowana] = true;
@@ -165,9 +195,15 @@ public class ProgramMain {
                              */
                             else if (i == machine2.size() - 1) {
                                 maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
-                                machine2.addLast(maintanances[wylosowana]);
-                                main_uses[wylosowana] = true;
-                                break;
+                                if (machine2.get(i).getTime_delay() > maintanances[wylosowana].getTime_delay()){
+                                    machine2.add(i,maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }else {
+                                    machine2.addLast(maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -175,6 +211,7 @@ public class ProgramMain {
             }
         }
 
+        displayTest(machine1,machine2);
 
 
         int instance_size = tasks.length/2;
@@ -312,7 +349,7 @@ public class ProgramMain {
                 /**
                  * Wylosowana część druga zadania i część pierwsza została użyta.
                  */
-                else if (tasks[wylosowana].getTask_name().equals("part2") && tasks_uses_test[wylosowana - instance_size]) {
+                else if (tasks_uses_test[wylosowana - instance_size] && tasks[wylosowana].getTask_name().equals("part2")) {
                     Task tmp = checkPartFirst(machine1, machine2, tasks[wylosowana].getNumber_task());
                     int part2_delay_time = (tmp.getTime_start() + tmp.getDuration());
 
@@ -393,7 +430,7 @@ public class ProgramMain {
                             /**
                              * Szukanie miejsca wpisania zadania.
                              */
-                            for (int i = 0; i < machine1.size(); i++) {
+                            for (int i = 0; i < machine2.size(); i++) {
                                 /**
                                  * Zmieści się przed pierwszym zadaniem.
                                  */
