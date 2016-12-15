@@ -30,12 +30,13 @@ public class ProgramMain {
         count_maintanance = 1 + size/8;
 
 
+        long start = System.currentTimeMillis();
         for (int k = 5; k<=50 ; k+=5) {
             size = k;
             for (int j =1; j<=100; j++) {
                 inscance_number = j;
 
-                System.out.println("size " + size+ " numer instancji "+ inscance_number);
+//                System.out.println("size " + size+ " numer instancji "+ inscance_number);
 
 
                 //tworzenie ścieżki do plików
@@ -57,15 +58,17 @@ public class ProgramMain {
                 for (int i = 0; i < 10; i++) {
                     Task[] tasks_clone = tasks.clone();
                     Maintanance[] maintanances_clone = maintanances.clone();
-                    System.out.println("Numer instacji " + (i + 1));
+//                    System.out.println("Numer instacji " + (i + 1));
                     solutions[i] = generatorV2(tasks_clone, maintanances_clone);
-                    solutions[i].displayMachine1();
-                    solutions[i].displayMachine2();
+//                    solutions[i].displayMachine1();
+//                    solutions[i].displayMachine2();
                     solutions[i].setFunction_target();
-                    System.out.println("Czas funkcji celu : " + solutions[i].getFunction_target());
+//                    System.out.println("Czas funkcji celu : " + solutions[i].getFunction_target());
                 }
             }
         }
+        long end = System.currentTimeMillis();
+        System.out.println("Całkowity czas : "+ (end - start) + " miliseconds");
     }
 
     /**
@@ -210,7 +213,7 @@ public class ProgramMain {
             }
         }
 
-        displayTest(machine1,machine2);
+//        displayTest(machine1,machine2);
 
 
         int instance_size = tasks.length/2;
@@ -549,7 +552,7 @@ public class ProgramMain {
             System.out.println(e);
         }
 
-        System.out.println(path);
+//        System.out.println(path);
         Task[] tasks = new Task[count_objects*2];
         scanner.nextLine();
         scanner.nextLine();
@@ -558,10 +561,10 @@ public class ProgramMain {
             String[] strings_array = null;
             strings_array = tmp.split(";");
 
-            System.out.println(strings_array[0] + " " +strings_array[1] + " "
-                    +strings_array[2] + " " +strings_array[3] + " " + strings_array[4]);
-            System.out.println(Integer.parseInt(strings_array[0]) + " " + Integer.parseInt(strings_array[1])+ " "
-                    +Byte.parseByte(strings_array[2]) + " " + Byte.parseByte(strings_array[3]) + " "+ Integer.parseInt(strings_array[4]));
+//            System.out.println(strings_array[0] + " " +strings_array[1] + " "
+//                    +strings_array[2] + " " +strings_array[3] + " " + strings_array[4]);
+//            System.out.println(Integer.parseInt(strings_array[0]) + " " + Integer.parseInt(strings_array[1])+ " "
+//                    +Byte.parseByte(strings_array[2]) + " " + Byte.parseByte(strings_array[3]) + " "+ Integer.parseInt(strings_array[4]));
 
             PartFirst partFirst = new PartFirst((i+1), Integer.parseInt(strings_array[0]), Byte.parseByte(strings_array[2])
                     , "part1", Integer.parseInt(strings_array[4]));
