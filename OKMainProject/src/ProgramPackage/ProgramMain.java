@@ -29,51 +29,28 @@ public class ProgramMain {
         count_object = size;
         count_maintanance = 1 + size/8;
 
-
+        //mierzenie czasu start
         long start = System.currentTimeMillis();
 //        for (int l = 5; l<=50 ; l+=5) {
 //            size = l;
 //            for (int j =1; j<=100; j++) {
 //                inscance_number = j;
-
 //                System.out.println("size " + size+ " numer instancji "+ inscance_number);
-
-
                 //tworzenie ścieżki do plików
                 path_to_instance = createPathToInstance(size, inscance_number);
 //                count_object =size;
                 //wczytanie tablicy zadań i przerw z pliku
                 Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
                 Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
-
-        //        displayTest(maintanances, tasks);
-
-
                 /**
                  * Tworzenie instancji wejściowych i wypełnieniej jej losowymi rozwiązaniami
                  */
-
-
                 Solution[] solutions = new Solution[10];
                 for (int i = 0; i < 10; i++) {
                     //kopiowanie głębokie obiektów z tablicy zadań
-                    Task[] tasks_clone = new Task[tasks.length];
-                    for (int k = 0; k<tasks.length; k++){
-                        if (tasks[k].getTask_name().equals("part1")){
-                            PartFirst nowe_zadanie = tasks[k].cloneFirst();
-                            tasks_clone[k] = nowe_zadanie;
-                        }else if (tasks[k].getTask_name().equals("part2")){
-                            PartSecond nowe_zadanie = tasks[k].cloneSecond();
-                            tasks_clone[k] = nowe_zadanie;
-                        }
-                    }
+                    Task[] tasks_clone = cloneTaskArray(tasks);
                     //kopiowanie głębokie obiektów maintanance
-                    Maintanance[] maintanances_clone = new Maintanance[maintanances.length];
-                    for (int k = 0; k<maintanances.length; k++){
-                        Maintanance nowa_przerwa = maintanances[k].cloneMaintanance();
-                        maintanances_clone[k] = nowa_przerwa;
-                    }
-
+                    Maintanance[] maintanances_clone = cloneMaintananceArray(maintanances);
 //                    System.out.println("Numer instacji " + (i + 1));
                     solutions[i] = generatorV2(tasks_clone, maintanances_clone);
 //                    solutions[i].displayMachine1();
@@ -83,8 +60,8 @@ public class ProgramMain {
                 }
 //            }
 //        }
+        //mierzenie czasu end
         long end = System.currentTimeMillis();
-
         /**
          * Wyświetla wszyskie rozwiązania
          */
@@ -92,9 +69,40 @@ public class ProgramMain {
                     x.displayMachine1();
                     x.displayMachine2();
                 }
-
-
         System.out.println("Całkowity czas : "+ (end - start) + " miliseconds");
+    }
+
+    /**
+     * Metoda wykonuje kopię głęboką tablicy przerw podanej na wejściu.
+     * @param maintanances - tablica przerw
+     * @return zwraca klona tablicy przerw
+     */
+    private static Maintanance[] cloneMaintananceArray(Maintanance[] maintanances){
+        Maintanance[] maintanances_clone = new Maintanance[maintanances.length];
+        for (int k = 0; k<maintanances.length; k++){
+            Maintanance nowa_przerwa = maintanances[k].cloneMaintanance();
+            maintanances_clone[k] = nowa_przerwa;
+        }
+        return maintanances_clone;
+    }
+
+    /**
+     * Metoda wykonuje kopię głęboką tablicy zadań podanej na wejściu.
+     * @param tasks - tablica zadań
+     * @return zwraca klona tablicy zadań
+     */
+    private static Task[] cloneTaskArray(Task[] tasks){
+        Task[] tasks_clone = new Task[tasks.length];
+        for (int k = 0; k<tasks.length; k++){
+            if (tasks[k].getTask_name().equals("part1")){
+                PartFirst nowe_zadanie = tasks[k].cloneFirst();
+                tasks_clone[k] = nowe_zadanie;
+            }else if (tasks[k].getTask_name().equals("part2")){
+                PartSecond nowe_zadanie = tasks[k].cloneSecond();
+                tasks_clone[k] = nowe_zadanie;
+            }
+        }
+        return tasks_clone;
     }
 
     /**
@@ -111,6 +119,11 @@ public class ProgramMain {
         return false;
     }
 
+    /**
+     * Metoda wyświetla na konsoli wszystkie dane obiektów umieszczonych na maszynach 1 i 2.
+     * @param machine1 - maszyna 1
+     * @param machine2 - maszyna 2
+     */
     private static void displayTest(LinkedList<Task> machine1, LinkedList<Task> machine2){
         System.out.println("Maszyna nr 1");
         for (Task x: machine1){
@@ -126,6 +139,14 @@ public class ProgramMain {
         }
     }
 
+    /**
+     * Generator randomowych instancji wejściowych, w pełni działający. Tworzy rozwiązania na zasadzie wprowadzenia
+     * najpierw do niego wszystkich rozwiązań, a następnie losuje zadanie, i umieszcza je na pierwszym możliwym
+     * miejscu w tablicy rozwiązań.
+     * @param tasks - tablica zadań
+     * @param maintanances - tablica przerw
+     * @return zwraca obiekt Solution będący obiektem zawierającym w sobie obie maszyny rozwiązania
+     */
     private static Solution generatorV2(Task[] tasks, Maintanance[] maintanances){
         LinkedList<Task> machine1 = new LinkedList<>();
         LinkedList<Task> machine2 = new LinkedList<>();
