@@ -99,10 +99,88 @@ public class ProgramMain {
             }
         }
 
+        displayArray(array_of_sequence_machine1,array_of_sequence_machine2);
+
+        //zamiana miejsc
+        Random random = new Random(System.currentTimeMillis());
+        boolean check = true;
+        boolean choose_machine = random.nextBoolean();
+
+        /**
+         * choose_machine
+         * -true dla maszyny nr1
+         * -false dla maszyny nr2
+         */
+        if (choose_machine) {
+            while (check) {
+                int choose1 = random.nextInt(array_of_sequence_machine1.length);
+                int choose2 = random.nextInt(array_of_sequence_machine1.length);
+
+                if (choose1 != choose2) {
+                    if (array_of_sequence_machine1[choose1] > 0
+                            && array_of_sequence_machine1[choose2] > 0
+                            && array_of_sequence_machine1[choose1] <= count_task
+                            && array_of_sequence_machine1[choose2] <= count_task) {
+                        System.out.println(choose1 + " " + choose2);
+                        int tmp = array_of_sequence_machine1[choose1];
+                        array_of_sequence_machine1[choose1] = array_of_sequence_machine1[choose2];
+                        array_of_sequence_machine1[choose2] = tmp;
+                        check = false;
+                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+                    } else if (array_of_sequence_machine1[choose1] > count_task
+                            && array_of_sequence_machine1[choose2] > count_task) {
+                        System.out.println(choose1 + " " + choose2);
+                        int tmp = array_of_sequence_machine1[choose1];
+                        array_of_sequence_machine1[choose1] = array_of_sequence_machine1[choose2];
+                        array_of_sequence_machine1[choose2] = tmp;
+                        check = false;
+                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+                    }
+                }
+            }
+        }else{
+            while (check) {
+                int choose1 = random.nextInt(array_of_sequence_machine2.length);
+                int choose2 = random.nextInt(array_of_sequence_machine2.length);
+
+                if (choose1 != choose2) {
+                    if (array_of_sequence_machine2[choose1] > 0
+                            && array_of_sequence_machine2[choose2] > 0
+                            && array_of_sequence_machine2[choose1] <= count_task
+                            && array_of_sequence_machine2[choose2] <= count_task) {
+                        System.out.println(choose1 + " " + choose2);
+                        int tmp = array_of_sequence_machine2[choose1];
+                        array_of_sequence_machine2[choose1] = array_of_sequence_machine2[choose2];
+                        array_of_sequence_machine2[choose2] = tmp;
+                        check = false;
+                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+                    } else if (array_of_sequence_machine2[choose1] > count_task
+                            && array_of_sequence_machine2[choose2] > count_task) {
+                        System.out.println(choose1 + " " + choose2);
+                        int tmp = array_of_sequence_machine2[choose1];
+                        array_of_sequence_machine2[choose1] = array_of_sequence_machine2[choose2];
+                        array_of_sequence_machine2[choose2] = tmp;
+                        check = false;
+                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+                    }
+                }
+            }
+        }
 
 
 
         return null;
+    }
+
+    private static void displayArray(int[] ints1, int[] ints2){
+        for (int x: ints1){
+            System.out.print(x+" ");
+        }
+        System.out.println();
+        for (int x: ints2){
+            System.out.print(x+" ");
+        }
+        System.out.println();
     }
 
 
