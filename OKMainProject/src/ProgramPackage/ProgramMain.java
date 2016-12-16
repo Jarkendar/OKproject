@@ -55,21 +55,55 @@ public class ProgramMain {
                     solution = generatorV2(tasks_clone, maintanances_clone);
 
                     solution.setFunction_target();
-
+        //wyświetlenie originału
         solution.displayMachine1();
         solution.displayMachine2();
         System.out.println("Czas funkcji celu : " + solution.getFunction_target());
 
+        //stworzenie i wyświetlenie klona
         Solution clone_solution = solution.cloneSolution();
         clone_solution.displayMachine1();
         clone_solution.displayMachine2();
         System.out.println("Czas funkcji celu : " + clone_solution.getFunction_target());
 
+        //wywołanie funkcji mutacji
+        createMutantSolution(clone_solution,size);
+
+
     }
 
-//    private static Solution createMutantSolution(Solution presolution){
-//        T
-//    }
+    private static Solution createMutantSolution(Solution presolution, int count_task){
+        // oznaczenia komórek tworzonej tabeli
+        // <1;count_task> - części pierwsze zadań
+        // <count_task+1;2*count_task> - części drugie zadań
+        // <-infinity; -1> - maintanance
+        int[] array_of_sequence_machine1 = new int[presolution.getMachine1().size()];
+        int[] array_of_sequence_machine2 = new int[presolution.getMachine2().size()];
+
+        for (int i = 0; i<presolution.getMachine1().size(); i++){
+            if (presolution.getMachine1().get(i).getTask_name().equals("part1")){
+                array_of_sequence_machine1[i] = presolution.getMachine1().get(i).getNumber_task();
+            }else if (presolution.getMachine1().get(i).getTask_name().equals("part2")){
+                array_of_sequence_machine1[i] = presolution.getMachine1().get(i).getNumber_task() + count_task;
+            }else if (presolution.getMachine1().get(i).getTask_name().equals("maintanance")){
+                array_of_sequence_machine1[i] = -presolution.getMachine1().get(i).getNumber_task();
+            }
+        }
+        for (int i = 0; i<presolution.getMachine2().size(); i++){
+            if (presolution.getMachine2().get(i).getTask_name().equals("part1")){
+                array_of_sequence_machine2[i] = presolution.getMachine2().get(i).getNumber_task();
+            }else if (presolution.getMachine2().get(i).getTask_name().equals("part2")){
+                array_of_sequence_machine2[i] = presolution.getMachine2().get(i).getNumber_task() + count_task;
+            }else if (presolution.getMachine2().get(i).getTask_name().equals("maintanance")){
+                array_of_sequence_machine2[i] = -presolution.getMachine2().get(i).getNumber_task();
+            }
+        }
+
+
+
+
+        return null;
+    }
 
 
 
