@@ -19,6 +19,22 @@ public class PartFirst extends Task {
         this.time_delay = time_delay;
     }
 
+    public PartFirst cloneFirst(){
+        PartFirst new_object = new PartFirst(this.getNumber_task(), this.getDuration()
+                ,this.getMachine_number(),this.getTask_name(),this.getTime_delay());
+        return new_object;
+    }
+
+    @Override
+    public PartSecond cloneSecond() {
+        return null;
+    }
+
+    @Override
+    public Maintanance cloneMaintanance() {
+        return null;
+    }
+
     public int getTime_delay() {
         return time_delay;
     }

@@ -16,5 +16,23 @@ public class PartSecond extends Task {
         super(number_task, duration, machine_number, task_name);
     }
 
+
+
+    public PartSecond cloneSecond(){
+        PartSecond new_object = new PartSecond(this.getNumber_task(), this.getDuration()
+                ,this.getMachine_number(),this.getTask_name());
+        return new_object;
+    }
+
+    @Override
+    public PartFirst cloneFirst() {
+        return null;
+    }
+
+    @Override
+    public Maintanance cloneMaintanance() {
+        return null;
+    }
+
     public int getTime_delay(){ return -1;}
 }

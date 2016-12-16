@@ -23,6 +23,10 @@ public abstract class Task {
         this.task_name = task_name;
     }
 
+    public abstract PartFirst cloneFirst();
+    public abstract PartSecond cloneSecond();
+    public abstract Maintanance cloneMaintanance();
+
     public abstract int getTime_delay();
 
     public int getNumber_task() {

@@ -31,17 +31,17 @@ public class ProgramMain {
 
 
         long start = System.currentTimeMillis();
-        for (int k = 5; k<=50 ; k+=5) {
-            size = k;
-            for (int j =1; j<=100; j++) {
-                inscance_number = j;
+//        for (int l = 5; l<=50 ; l+=5) {
+//            size = l;
+//            for (int j =1; j<=100; j++) {
+//                inscance_number = j;
 
 //                System.out.println("size " + size+ " numer instancji "+ inscance_number);
 
 
                 //tworzenie ścieżki do plików
                 path_to_instance = createPathToInstance(size, inscance_number);
-                count_object =size;
+//                count_object =size;
                 //wczytanie tablicy zadań i przerw z pliku
                 Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
                 Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
@@ -56,8 +56,24 @@ public class ProgramMain {
 
                 Solution[] solutions = new Solution[10];
                 for (int i = 0; i < 10; i++) {
-                    Task[] tasks_clone = tasks.clone();
-                    Maintanance[] maintanances_clone = maintanances.clone();
+                    //kopiowanie głębokie obiektów z tablicy zadań
+                    Task[] tasks_clone = new Task[tasks.length];
+                    for (int k = 0; k<tasks.length; k++){
+                        if (tasks[k].getTask_name().equals("part1")){
+                            PartFirst nowe_zadanie = tasks[k].cloneFirst();
+                            tasks_clone[k] = nowe_zadanie;
+                        }else if (tasks[k].getTask_name().equals("part2")){
+                            PartSecond nowe_zadanie = tasks[k].cloneSecond();
+                            tasks_clone[k] = nowe_zadanie;
+                        }
+                    }
+                    //kopiowanie głębokie obiektów maintanance
+                    Maintanance[] maintanances_clone = new Maintanance[maintanances.length];
+                    for (int k = 0; k<maintanances.length; k++){
+                        Maintanance nowa_przerwa = maintanances[k].cloneMaintanance();
+                        maintanances_clone[k] = nowa_przerwa;
+                    }
+
 //                    System.out.println("Numer instacji " + (i + 1));
                     solutions[i] = generatorV2(tasks_clone, maintanances_clone);
 //                    solutions[i].displayMachine1();
@@ -65,9 +81,19 @@ public class ProgramMain {
                     solutions[i].setFunction_target();
 //                    System.out.println("Czas funkcji celu : " + solutions[i].getFunction_target());
                 }
-            }
-        }
+//            }
+//        }
         long end = System.currentTimeMillis();
+
+        /**
+         * Wyświetla wszyskie rozwiązania
+         */
+        for (Solution x : solutions){
+                    x.displayMachine1();
+                    x.displayMachine2();
+                }
+
+
         System.out.println("Całkowity czas : "+ (end - start) + " miliseconds");
     }
 
