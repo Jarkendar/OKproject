@@ -1,5 +1,8 @@
 package ProgramPackage;
 
+import ProgramPackage.TaskPackage.Maintanance;
+import ProgramPackage.TaskPackage.PartFirst;
+import ProgramPackage.TaskPackage.PartSecond;
 import ProgramPackage.TaskPackage.Task;
 
 import java.util.LinkedList;
@@ -22,6 +25,41 @@ public class Solution {
         this.machine1 = machine1;
         this.machine2 = machine2;
 
+    }
+
+    /**
+     * Metoda klonuje rozwiazanie.
+     * @return zwraca klona rozwiązania
+     */
+    public Solution cloneSolution(){
+        LinkedList<Task> clone_machine1 = this.cloneMachineList(this.machine1);
+        LinkedList<Task> clone_machine2 = this.cloneMachineList(this.machine2);
+        Solution new_solution = new Solution(clone_machine1,clone_machine2);
+        new_solution.setFunction_target();
+        return new_solution;
+    }
+
+    /**
+     * Metoda klonuje listę zadań
+     * @param tasks - maszyna z listą zadań
+     * @return zwraca klona maszyny
+     */
+    private LinkedList<Task> cloneMachineList(LinkedList<Task> tasks){
+        LinkedList<Task> new_list = new LinkedList<>();
+        for (int i = 0; i<tasks.size(); i++){
+            if (tasks.get(i).getTask_name().equals("part1")){
+                PartFirst partFirst = tasks.get(i).cloneFirst();
+                new_list.addLast(partFirst);
+            }else if (tasks.get(i).getTask_name().equals("part2")){
+                PartSecond partSecond = tasks.get(i).cloneSecond();
+                new_list.addLast(partSecond);
+            }
+            if (tasks.get(i).getTask_name().equals("maintanance")){
+                Maintanance maintanance = tasks.get(i).cloneMaintanance();
+                new_list.addLast(maintanance);
+            }
+        }
+        return new_list;
     }
 
     public int getFunction_target() {

@@ -45,32 +45,33 @@ public class ProgramMain {
                 /**
                  * Tworzenie instancji wejściowych i wypełnieniej jej losowymi rozwiązaniami
                  */
-                Solution[] solutions = new Solution[10];
-                for (int i = 0; i < 10; i++) {
+                Solution solution = null;
+
                     //kopiowanie głębokie obiektów z tablicy zadań
                     Task[] tasks_clone = cloneTaskArray(tasks);
                     //kopiowanie głębokie obiektów maintanance
                     Maintanance[] maintanances_clone = cloneMaintananceArray(maintanances);
-//                    System.out.println("Numer instacji " + (i + 1));
-                    solutions[i] = generatorV2(tasks_clone, maintanances_clone);
-//                    solutions[i].displayMachine1();
-//                    solutions[i].displayMachine2();
-                    solutions[i].setFunction_target();
-//                    System.out.println("Czas funkcji celu : " + solutions[i].getFunction_target());
-                }
-//            }
-//        }
-        //mierzenie czasu end
-        long end = System.currentTimeMillis();
-        /**
-         * Wyświetla wszyskie rozwiązania
-         */
-        for (Solution x : solutions){
-                    x.displayMachine1();
-                    x.displayMachine2();
-                }
-        System.out.println("Całkowity czas : "+ (end - start) + " miliseconds");
+
+                    solution = generatorV2(tasks_clone, maintanances_clone);
+
+                    solution.setFunction_target();
+
+        solution.displayMachine1();
+        solution.displayMachine2();
+        System.out.println("Czas funkcji celu : " + solution.getFunction_target());
+
+        Solution clone_solution = solution.cloneSolution();
+        clone_solution.displayMachine1();
+        clone_solution.displayMachine2();
+        System.out.println("Czas funkcji celu : " + clone_solution.getFunction_target());
+
     }
+
+//    private static Solution createMutantSolution(Solution presolution){
+//        T
+//    }
+
+
 
     /**
      * Metoda wykonuje kopię głęboką tablicy przerw podanej na wejściu.

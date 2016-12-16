@@ -21,6 +21,7 @@ public class PartSecond extends Task {
     public PartSecond cloneSecond(){
         PartSecond new_object = new PartSecond(this.getNumber_task(), this.getDuration()
                 ,this.getMachine_number(),this.getTask_name());
+        new_object.setTime_start(this.getTime_start());
         return new_object;
     }
 
