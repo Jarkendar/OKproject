@@ -67,16 +67,39 @@ public class ProgramMain {
         System.out.println("Czas funkcji celu : " + clone_solution.getFunction_target());
 
         //wywołanie funkcji mutacji
-        for (int i = 0; i<10; i++) {
+        long startm = System.currentTimeMillis();
+        for (int i = 0; i<1000000; i++) {
             Task[] test_mutant_task = cloneTaskArray(tasks);
             Maintanance[] test_mutant_maintanance = cloneMaintananceArray(maintanances);
             Solution mutant = createMutantSolution(clone_solution, size, test_mutant_task, test_mutant_maintanance);
-            System.out.println("Mutant "  +1);
-            mutant.displayMachine1();
-            mutant.displayMachine2();
-            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
+//            System.out.println("Mutant "  +(i+1));
+//            mutant.displayMachine1();
+//            mutant.displayMachine2();
+//            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
         }
+        long stopm = System.currentTimeMillis();
+        System.out.println("Czas dla 1 000 000 mutacji "+ (stopm-startm) + " milis" );
 
+    }
+
+    private static int searchComplementaryTaskOnAgainstMachine(int[] tablica, int number_task, int size){
+        /**
+         * Gdy szukamy części pierwszej zadania
+         */
+        if (number_task>size){
+            for (int i = 0; i<tablica.length; i++){
+                if (tablica[i] == (number_task-size)) return i;
+            }
+        }
+        /**
+         * Gdy szukamy części drugiej zadania.
+         */
+        else {
+            for (int i = 0; i<tablica.length; i++){
+                if (tablica[i] == (number_task+size)) return i;
+            }
+        }
+        return -1;
     }
 
     private static Solution createMutantSolution(Solution presolution, int count_task, Task[] tasks, Maintanance[] maintanances){
@@ -87,6 +110,9 @@ public class ProgramMain {
         int[] array_of_sequence_machine1 = new int[presolution.getMachine1().size()];
         int[] array_of_sequence_machine2 = new int[presolution.getMachine2().size()];
 
+        /**
+         * Przygotowanie tablicy kolejności
+         */
         for (int i = 0; i<presolution.getMachine1().size(); i++){
             if (presolution.getMachine1().get(i).getTask_name().equals("part1")){
                 array_of_sequence_machine1[i] = presolution.getMachine1().get(i).getNumber_task();
@@ -106,7 +132,7 @@ public class ProgramMain {
             }
         }
 
-        displayArray(array_of_sequence_machine1,array_of_sequence_machine2);
+//        displayArray(array_of_sequence_machine1,array_of_sequence_machine2);
 
         //zamiana miejsc
         Random random = new Random(System.currentTimeMillis());
@@ -128,22 +154,38 @@ public class ProgramMain {
                             && array_of_sequence_machine1[choose2] > 0
                             && array_of_sequence_machine1[choose1] <= count_task
                             && array_of_sequence_machine1[choose2] <= count_task) {
-                        System.out.println(choose1 + " " + choose2);
+//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine1[choose1];
                         array_of_sequence_machine1[choose1] = array_of_sequence_machine1[choose2];
                         array_of_sequence_machine1[choose2] = tmp;
                         check = false;
-                        System.out.println("maszyna 1 zamiana części pierwszej");
-                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+
+                        int ch2 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine2, array_of_sequence_machine1[choose1], count_task);
+                        int ch3 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine2, array_of_sequence_machine1[choose2], count_task);
+
+                        tmp = array_of_sequence_machine2[ch2];
+                        array_of_sequence_machine2[ch2] = array_of_sequence_machine2[ch3];
+                        array_of_sequence_machine2[ch3] = tmp;
+
+//                        System.out.println("maszyna 1 zamiana części pierwszej");
+//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     } else if (array_of_sequence_machine1[choose1] > count_task
                             && array_of_sequence_machine1[choose2] > count_task) {
-                        System.out.println(choose1 + " " + choose2);
+//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine1[choose1];
                         array_of_sequence_machine1[choose1] = array_of_sequence_machine1[choose2];
                         array_of_sequence_machine1[choose2] = tmp;
                         check = false;
-                        System.out.println("maszyna 1 zamiana części drugiej");
-                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+
+                        int ch2 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine2, array_of_sequence_machine1[choose1], count_task);
+                        int ch3 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine2, array_of_sequence_machine1[choose2], count_task);
+
+                        tmp = array_of_sequence_machine2[ch2];
+                        array_of_sequence_machine2[ch2] = array_of_sequence_machine2[ch3];
+                        array_of_sequence_machine2[ch3] = tmp;
+
+//                        System.out.println("maszyna 1 zamiana części drugiej");
+//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     }
                 }
             }
@@ -157,22 +199,38 @@ public class ProgramMain {
                             && array_of_sequence_machine2[choose2] > 0
                             && array_of_sequence_machine2[choose1] <= count_task
                             && array_of_sequence_machine2[choose2] <= count_task) {
-                        System.out.println(choose1 + " " + choose2);
+//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine2[choose1];
                         array_of_sequence_machine2[choose1] = array_of_sequence_machine2[choose2];
                         array_of_sequence_machine2[choose2] = tmp;
                         check = false;
-                        System.out.println("maszyna 2 zamiana części pierwszej");
-                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+
+                        int ch2 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine1, array_of_sequence_machine2[choose1], count_task);
+                        int ch3 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine1, array_of_sequence_machine2[choose2], count_task);
+
+                        tmp = array_of_sequence_machine1[ch2];
+                        array_of_sequence_machine1[ch2] = array_of_sequence_machine1[ch3];
+                        array_of_sequence_machine1[ch3] = tmp;
+
+//                        System.out.println("maszyna 2 zamiana części pierwszej");
+//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     } else if (array_of_sequence_machine2[choose1] > count_task
                             && array_of_sequence_machine2[choose2] > count_task) {
-                        System.out.println(choose1 + " " + choose2);
+//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine2[choose1];
                         array_of_sequence_machine2[choose1] = array_of_sequence_machine2[choose2];
                         array_of_sequence_machine2[choose2] = tmp;
                         check = false;
-                        System.out.println("maszyna 2 zamiana części drugiej");
-                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
+
+                        int ch2 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine1, array_of_sequence_machine2[choose1], count_task);
+                        int ch3 = searchComplementaryTaskOnAgainstMachine(array_of_sequence_machine1, array_of_sequence_machine2[choose2], count_task);
+
+                        tmp = array_of_sequence_machine1[ch2];
+                        array_of_sequence_machine1[ch2] = array_of_sequence_machine1[ch3];
+                        array_of_sequence_machine1[ch3] = tmp;
+
+//                        System.out.println("maszyna 2 zamiana części drugiej");
+//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     }
                 }
             }
@@ -224,7 +282,10 @@ public class ProgramMain {
                     Task tmp = checkPartFirst(machinenr1, machinenr2, tasks[array_of_sequence_machine1[position_on_machine1] - 1].getNumber_task());
                     if (tmp != null) {
                         int time_delay_part2 = tmp.getTime_start() + tmp.getDuration();
-                        if (machinenr1.get(position_on_machine1 - 1).getTime_start() + machinenr1.get(position_on_machine1 - 1).getDuration()
+                        if (position_on_machine1 == 0) {
+                            tasks[array_of_sequence_machine1[position_on_machine1]-1].setTime_start(time_delay_part2);
+                        }
+                        else if (machinenr1.get(position_on_machine1 - 1).getTime_start() + machinenr1.get(position_on_machine1 - 1).getDuration()
                                 >= time_delay_part2) {
                             tasks[array_of_sequence_machine1[position_on_machine1] - 1]
                                     .setTime_start(machinenr1.get(position_on_machine1 - 1)
@@ -279,7 +340,10 @@ public class ProgramMain {
                     Task tmp = checkPartFirst(machinenr1, machinenr2, tasks[array_of_sequence_machine2[position_on_machine2]-1].getNumber_task());
                     if (tmp != null){
                         int time_delay_part2 = tmp.getTime_start()+tmp.getDuration();
-                        if (machinenr2.get(position_on_machine2-1).getTime_start()+machinenr2.get(position_on_machine2-1).getDuration()
+                        if (position_on_machine2 == 0) {
+                            tasks[array_of_sequence_machine2[position_on_machine2]-1].setTime_start(time_delay_part2);
+                        }
+                        else if (machinenr2.get(position_on_machine2-1).getTime_start()+machinenr2.get(position_on_machine2-1).getDuration()
                                 >= time_delay_part2){
                             tasks[array_of_sequence_machine2[position_on_machine2]-1]
                                     .setTime_start(machinenr2.get(position_on_machine2-1)
@@ -296,7 +360,6 @@ public class ProgramMain {
             }
             else {
                 number_of_machine = !number_of_machine;
-                System.out.println("zmiana");
             }
         }
 
