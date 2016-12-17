@@ -16,6 +16,8 @@ import java.util.Scanner;
  */
 public class ProgramMain {
     public static void main(String[] args) {
+        TestsClass testsClass = new TestsClass();
+
         int size = 0, inscance_number = 0;
         int count_object = 0, count_maintanance = 0;
         String path_to_instance = "";
@@ -76,6 +78,8 @@ public class ProgramMain {
             mutant.displayMachine1();
             mutant.displayMachine2();
             System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
+        System.out.println("Originał nakłada się "+testsClass.sprawdzNakładanieZadan(solution));
+        System.out.println("Mutant nakłada się "+testsClass.sprawdzNakładanieZadan(mutant));
 //        }
         long stopm = System.currentTimeMillis();
         System.out.println("Czas dla 1 000 000 mutacji "+ (stopm-startm) + " milis" );
