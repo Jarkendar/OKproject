@@ -68,20 +68,27 @@ public class ProgramMain {
 
         //wywołanie funkcji mutacji
         long startm = System.currentTimeMillis();
-        for (int i = 0; i<1000000; i++) {
+//        for (int i = 0; i<1000000; i++) {
             Task[] test_mutant_task = cloneTaskArray(tasks);
             Maintanance[] test_mutant_maintanance = cloneMaintananceArray(maintanances);
             Solution mutant = createMutantSolution(clone_solution, size, test_mutant_task, test_mutant_maintanance);
 //            System.out.println("Mutant "  +(i+1));
-//            mutant.displayMachine1();
-//            mutant.displayMachine2();
-//            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
-        }
+            mutant.displayMachine1();
+            mutant.displayMachine2();
+            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
+//        }
         long stopm = System.currentTimeMillis();
         System.out.println("Czas dla 1 000 000 mutacji "+ (stopm-startm) + " milis" );
 
     }
 
+    /**
+     * Metoda szuka komplementarnego zadania na przeciwnej maszynie
+     * @param tablica - tablica kolejności przeciwnej maszyny
+     * @param number_task - numer zadania
+     * @param size - rozmiar instancji
+     * @return - zwraca indeks w tablicy na którym znajduje się komplementarne zadanie
+     */
     private static int searchComplementaryTaskOnAgainstMachine(int[] tablica, int number_task, int size){
         /**
          * Gdy szukamy części pierwszej zadania
@@ -245,18 +252,41 @@ public class ProgramMain {
         //true = machine1
         //false = machine2
         //dopóki nie wykorzystamy wszystkich zadań
+
+        /**
+         * Wyjaśnienie oznaczeń :
+         * 1)w tablicy kolejności mam numery zadań, dziwnym zbiegiem okoliczności numery te pomniejszone o 1
+         * odpowiadają zadaniu z tablicy przekazywanej Task[], dlatego gdy się odwołuję do nich mam
+         * task[array...[positionx]-1]
+         * 2)Teraz odwoływanie się do listy, position_on_machinex odpowiada aktualnie przeglądanej komórce w tablicy,
+         * zatem na liście już w części stworzonej jest positionx-1 obiektów,
+         * przez co muszę w ten sposób się do nich odwoływać
+         */
+
+        /**
+         * Rób dopóki nie skończysz obu tablic kolejności
+         */
         while(position_on_machine1 < array_of_sequence_machine1.length
                 || position_on_machine2 < array_of_sequence_machine2.length ){
+
+
             if (number_of_machine && position_on_machine1 < array_of_sequence_machine1.length) {
                 /**
                  * jeśli zadanie jest częścią pierwszą to można bez przeszkód włożyć na listę
                  */
                 if (array_of_sequence_machine1[position_on_machine1] > 0
                         && array_of_sequence_machine1[position_on_machine1] <= count_task) {
+                    /**
+                     * Jeśli maszyna jest jeszcze pusta
+                     */
                     if (position_on_machine1 == 0) {
                         tasks[array_of_sequence_machine1[position_on_machine1] - 1]
                                 .setTime_start(tasks[array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay());
-                    } else {
+                    }
+                    /**
+                     * Jeśli nie to rozpatrz czy należy zaczynać od końca poprzedniego zadania czy czasu opóźnienia
+                     */
+                    else {
                         if (machinenr1.get(position_on_machine1 - 1).getTime_start() + machinenr1.get(position_on_machine1 - 1).getDuration()
                                 >= tasks[array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay()) {
                             tasks[array_of_sequence_machine1[position_on_machine1] - 1]
@@ -278,13 +308,24 @@ public class ProgramMain {
                             .setTime_start(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay());
                     machinenr1.addLast(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
                     position_on_machine1++;
-                } else if (array_of_sequence_machine1[position_on_machine1] > count_task) {
+                }
+                /**
+                 * Jeśli zadanie jest częścią drugą, należy znaleźć na przeciwnej maszynie część pierwszą
+                 * jeśli się znajdzie część drugą można wstawić, jeśli nie to należy zamienić maszyny
+                 */
+                else if (array_of_sequence_machine1[position_on_machine1] > count_task) {
                     Task tmp = checkPartFirst(machinenr1, machinenr2, tasks[array_of_sequence_machine1[position_on_machine1] - 1].getNumber_task());
                     if (tmp != null) {
                         int time_delay_part2 = tmp.getTime_start() + tmp.getDuration();
+                        /**
+                         * Jeśli zadanie jest pierwsze na liście
+                         */
                         if (position_on_machine1 == 0) {
                             tasks[array_of_sequence_machine1[position_on_machine1]-1].setTime_start(time_delay_part2);
                         }
+                        /**
+                         * Sprawdzenie na kiedy ustawić time_start, czas zakończenia poprzedniego zadania czy czas opóźnienia
+                         */
                         else if (machinenr1.get(position_on_machine1 - 1).getTime_start() + machinenr1.get(position_on_machine1 - 1).getDuration()
                                 >= time_delay_part2) {
                             tasks[array_of_sequence_machine1[position_on_machine1] - 1]
@@ -295,7 +336,11 @@ public class ProgramMain {
                         }
                         machinenr1.addLast(tasks[array_of_sequence_machine1[position_on_machine1] - 1]);
                         position_on_machine1++;
-                    } else {
+                    }
+                    /**
+                     * Zmień maszynę
+                     */
+                    else {
                         number_of_machine = !number_of_machine;
                     }
                 }
@@ -310,10 +355,16 @@ public class ProgramMain {
                  */
                 if (array_of_sequence_machine2[position_on_machine2] > 0
                         && array_of_sequence_machine2[position_on_machine2] <= count_task) {
+                    /**
+                     * Jeśli zadanie jest pierwsze na liście
+                     */
                     if (position_on_machine2 == 0){
                         tasks[array_of_sequence_machine2[position_on_machine2]-1]
                                 .setTime_start(tasks[array_of_sequence_machine2[position_on_machine2]-1].getTime_delay());
                     }else {
+                        /**
+                         * Ustalanie czasu rozpoczęcia, end ostatniego czy time_delay
+                         */
                         if (machinenr2.get(position_on_machine2-1).getTime_start() + machinenr2.get(position_on_machine2-1).getDuration()
                                 >= tasks[array_of_sequence_machine2[position_on_machine2]-1].getTime_delay()) {
                             tasks[array_of_sequence_machine2[position_on_machine2]-1]
@@ -336,13 +387,22 @@ public class ProgramMain {
                     machinenr2.addLast(maintanances[-array_of_sequence_machine2[position_on_machine2]-1]);
                     position_on_machine2++;
                 }
+                /**
+                 * Jeśli zadanie jest częścią drugą, trzeba poszukać komplementarnego
+                 */
                 else if (array_of_sequence_machine2[position_on_machine2] > count_task){
                     Task tmp = checkPartFirst(machinenr1, machinenr2, tasks[array_of_sequence_machine2[position_on_machine2]-1].getNumber_task());
                     if (tmp != null){
                         int time_delay_part2 = tmp.getTime_start()+tmp.getDuration();
+                        /**
+                         * Jeśli maszyna jest jeszcze pusta
+                         */
                         if (position_on_machine2 == 0) {
                             tasks[array_of_sequence_machine2[position_on_machine2]-1].setTime_start(time_delay_part2);
                         }
+                        /**
+                         * Ustawienie czasu rozpoczęcia, end ostatniego czy time_delay
+                         */
                         else if (machinenr2.get(position_on_machine2-1).getTime_start()+machinenr2.get(position_on_machine2-1).getDuration()
                                 >= time_delay_part2){
                             tasks[array_of_sequence_machine2[position_on_machine2]-1]
@@ -353,11 +413,18 @@ public class ProgramMain {
                         }
                         machinenr2.addLast(tasks[array_of_sequence_machine2[position_on_machine2]-1]);
                         position_on_machine2++;
-                    }else {
+                    }
+                    /**
+                     * nie znaleziono to zmiana maszyny
+                     */
+                    else {
                         number_of_machine = !number_of_machine;
                     }
                 }
             }
+            /**
+             * Jeśli nic nie pasowało to zmień maszynę
+             */
             else {
                 number_of_machine = !number_of_machine;
             }
