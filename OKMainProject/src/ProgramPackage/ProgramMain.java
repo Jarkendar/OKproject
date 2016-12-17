@@ -58,29 +58,37 @@ public class ProgramMain {
 
                     solution.setFunction_target();
         //wyświetlenie originału
-        solution.displayMachine1();
-        solution.displayMachine2();
-        System.out.println("Czas funkcji celu : " + solution.getFunction_target());
+//        solution.displayMachine1();
+//        solution.displayMachine2();
+//        System.out.println("Czas funkcji celu : " + solution.getFunction_target());
 
         //stworzenie i wyświetlenie klona
         Solution clone_solution = solution.cloneSolution();
-        clone_solution.displayMachine1();
-        clone_solution.displayMachine2();
-        System.out.println("Czas funkcji celu : " + clone_solution.getFunction_target());
+//        clone_solution.displayMachine1();
+//        clone_solution.displayMachine2();
+//        System.out.println("Czas funkcji celu : " + clone_solution.getFunction_target());
 
         //wywołanie funkcji mutacji
         long startm = System.currentTimeMillis();
-//        for (int i = 0; i<1000000; i++) {
+        for (int i = 0; i<100000; i++) {
             Task[] test_mutant_task = cloneTaskArray(tasks);
             Maintanance[] test_mutant_maintanance = cloneMaintananceArray(maintanances);
             Solution mutant = createMutantSolution(clone_solution, size, test_mutant_task, test_mutant_maintanance);
 //            System.out.println("Mutant "  +(i+1));
-            mutant.displayMachine1();
-            mutant.displayMachine2();
-            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
-        System.out.println("Originał nakłada się "+testsClass.sprawdzNakładanieZadan(solution));
-        System.out.println("Mutant nakłada się "+testsClass.sprawdzNakładanieZadan(mutant));
-//        }
+//            mutant.displayMachine1();
+//            mutant.displayMachine2();
+//            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
+            if (testsClass.sprawdzNakładanieZadan(mutant)){
+                System.out.println("Mutant "  +(i+1));
+                mutant.displayMachine1();
+                mutant.displayMachine2();
+                System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
+                System.out.println("Originał nakłada się "+testsClass.sprawdzNakładanieZadan(solution));
+                System.out.println("Mutant nakłada się "+testsClass.sprawdzNakładanieZadan(mutant));
+            }
+//        System.out.println("Originał nakłada się "+testsClass.sprawdzNakładanieZadan(solution));
+//        System.out.println("Mutant nakłada się "+testsClass.sprawdzNakładanieZadan(mutant));
+        }
         long stopm = System.currentTimeMillis();
         System.out.println("Czas dla 1 000 000 mutacji "+ (stopm-startm) + " milis" );
 
@@ -320,10 +328,19 @@ public class ProgramMain {
                     }
                     else if( (machinenr1.get(position_on_machine1-1).getTime_start()+machinenr1.get(position_on_machine1-1).getDuration())
                             > maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay()){
-                        machinenr1.get(position_on_machine1-1).setTime_start(
-                                maintanances[-array_of_sequence_machine1[position_on_machine1]-1].getTime_delay()
-                                        + maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getDuration() );
-                        machinenr1.add(position_on_machine1-1, maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
+                        int m = 1;
+                        while (m<=position_on_machine1 && (machinenr1.get(position_on_machine1 - m).getTime_start() + machinenr1.get(position_on_machine1 - m).getDuration())
+                                > maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay()) {
+                            m++;
+                        }
+                        m--;
+                        machinenr1.add(position_on_machine1-m, maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
+                        m--;
+                        while(m>=0) {
+                            machinenr1.get(position_on_machine1 - m).setTime_start(machinenr1.get(position_on_machine1 -m -1).getTime_start()+
+                                    machinenr1.get(position_on_machine1 - m -1).getDuration());
+                            m--;
+                        }
                     }else {
                         machinenr1.addLast(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
                     }
@@ -414,10 +431,21 @@ public class ProgramMain {
                     }
                     else if( (machinenr2.get(position_on_machine2-1).getTime_start()+machinenr2.get(position_on_machine2-1).getDuration())
                             > maintanances[-array_of_sequence_machine2[position_on_machine2] - 1].getTime_delay()){
-                        machinenr2.get(position_on_machine2-1).setTime_start(
-                                maintanances[-array_of_sequence_machine2[position_on_machine2]-1].getTime_delay()
-                                        + maintanances[-array_of_sequence_machine2[position_on_machine2] - 1].getDuration() );
-                        machinenr2.add(position_on_machine2-1, maintanances[-array_of_sequence_machine2[position_on_machine2] - 1]);
+                        int m = 1;
+
+                        while (m<=position_on_machine2 && (machinenr2.get(position_on_machine2 - m).getTime_start() + machinenr2.get(position_on_machine2 - m).getDuration())
+                                > maintanances[-array_of_sequence_machine2[position_on_machine2] - 1].getTime_delay()) {
+                            m++;
+                        }
+
+                        m--;
+                        machinenr2.add(position_on_machine2-m, maintanances[-array_of_sequence_machine2[position_on_machine2] - 1]);
+                        m--;
+                        while(m>=0) {
+                            machinenr2.get(position_on_machine2 - m).setTime_start(machinenr2.get(position_on_machine2 -m -1).getTime_start()+
+                                    machinenr2.get(position_on_machine2 - m -1).getDuration());
+                            m--;
+                        }
                     }else {
                         machinenr2.addLast(maintanances[-array_of_sequence_machine2[position_on_machine2] - 1]);
                     }
