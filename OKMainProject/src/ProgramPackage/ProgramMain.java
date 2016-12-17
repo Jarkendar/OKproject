@@ -301,12 +301,28 @@ public class ProgramMain {
                     position_on_machine1++;
                 }
                 /**
-                 * Jeśli zadanie jest maintanacem, można bez przeszkód włożyć na listę.
+                 * Jeśli zadanie jest maintanacem, można bez przeszkód włożyć na listę.?
                  */
                 else if (array_of_sequence_machine1[position_on_machine1] < 0) {
                     maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]
                             .setTime_start(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay());
-                    machinenr1.addLast(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
+                    /**
+                     * Sprawdzenie czy maintanace nie nachodzi na zadanie poprzedzające
+                     * jeśli nachodzi to wsadz go przed zadanie poprzedzające,
+                     * a czas startu zadania poprzedzającego ustaw na czas zakończenia maintanancu
+                     */
+                    if (position_on_machine1 == 0){
+                        machinenr1.addLast(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
+                    }
+                    else if( (machinenr1.get(position_on_machine1-1).getTime_start()+machinenr1.get(position_on_machine1-1).getDuration())
+                            > maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getTime_delay()){
+                        machinenr1.get(position_on_machine1-1).setTime_start(
+                                maintanances[-array_of_sequence_machine1[position_on_machine1]-1].getTime_delay()
+                                        + maintanances[-array_of_sequence_machine1[position_on_machine1] - 1].getDuration() );
+                        machinenr1.add(position_on_machine1-1, maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
+                    }else {
+                        machinenr1.addLast(maintanances[-array_of_sequence_machine1[position_on_machine1] - 1]);
+                    }
                     position_on_machine1++;
                 }
                 /**
@@ -384,7 +400,23 @@ public class ProgramMain {
                 else if (array_of_sequence_machine2[position_on_machine2] < 0){
                     maintanances[-array_of_sequence_machine2[position_on_machine2]-1]
                             .setTime_start(maintanances[-array_of_sequence_machine2[position_on_machine2]-1].getTime_delay());
-                    machinenr2.addLast(maintanances[-array_of_sequence_machine2[position_on_machine2]-1]);
+                    /**
+                     * Sprawdzenie czy maintanace nie nachodzi na zadanie poprzedzające
+                     * jeśli nachodzi to wsadz go przed zadanie poprzedzające,
+                     * a czas startu zadania poprzedzającego ustaw na czas zakończenia maintanancu
+                     */
+                    if (position_on_machine2 == 0){
+                        machinenr2.addLast(maintanances[-array_of_sequence_machine2[position_on_machine2] - 1]);
+                    }
+                    else if( (machinenr2.get(position_on_machine2-1).getTime_start()+machinenr2.get(position_on_machine2-1).getDuration())
+                            > maintanances[-array_of_sequence_machine2[position_on_machine2] - 1].getTime_delay()){
+                        machinenr2.get(position_on_machine2-1).setTime_start(
+                                maintanances[-array_of_sequence_machine2[position_on_machine2]-1].getTime_delay()
+                                        + maintanances[-array_of_sequence_machine2[position_on_machine2] - 1].getDuration() );
+                        machinenr2.add(position_on_machine2-1, maintanances[-array_of_sequence_machine2[position_on_machine2] - 1]);
+                    }else {
+                        machinenr2.addLast(maintanances[-array_of_sequence_machine2[position_on_machine2] - 1]);
+                    }
                     position_on_machine2++;
                 }
                 /**
