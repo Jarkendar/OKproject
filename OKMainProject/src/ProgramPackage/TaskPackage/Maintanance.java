@@ -19,6 +19,24 @@ public class Maintanance extends Task{
         this.time_delay = time_delay;
     }
 
+    @Override
+    public PartFirst cloneFirst() {
+        return null;
+    }
+
+    @Override
+    public PartSecond cloneSecond() {
+        return null;
+    }
+
+    @Override
+    public Maintanance cloneMaintanance() {
+        Maintanance new_object = new Maintanance(this.getNumber_task(),this.getDuration()
+                ,this.getMachine_number(),this.getTask_name(),this.getTime_delay());
+        new_object.setTime_start(this.getTime_start());
+        return new_object;
+    }
+
     public int getTime_delay() {
         return time_delay;
     }
