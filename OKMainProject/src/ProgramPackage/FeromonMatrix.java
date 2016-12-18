@@ -116,7 +116,7 @@ public class FeromonMatrix {
     public void displayFeromonMatrix(){
         for (int i=0; i<this.feromonMatrix.length; i++ ){
             for (int k = 0; k<this.feromonMatrix[i].length ; k++){
-                System.out.print(this.feromonMatrix[i][k] + " ");
+                System.out.format("%.2f ", this.feromonMatrix[i][k]);
             }
             System.out.println();
         }
