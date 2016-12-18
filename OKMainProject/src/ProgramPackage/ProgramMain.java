@@ -126,7 +126,19 @@ public class ProgramMain {
         System.out.println("Tablica feromonowa 2");
         feromonMatrix_machine2.displayFeromonMatrix();
 
+//*********************TESTY FUNKCJI WYRÓWNUJĄCEJ RÓŻNICE W RZĘDZIE MACIERZY*************
+        double[] array_in = {0,10,15,30,50,1000};
+        double[] array_out = feromonMatrix_machine1.alignValueInMatrix(array_in);
 
+        System.out.println("Tablica wejściowa ");
+        for (double x: array_in){
+            System.out.format("%.2f ", x);
+        }
+        System.out.println("\nTablica wyjściowa ");
+        for (double x: array_out){
+            System.out.format("%.2f ", x);
+        }
+        System.out.println();
     }
 
     /**

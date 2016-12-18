@@ -28,8 +28,43 @@ public class FeromonMatrix {
         }
     }
 
-    public void alignValueInMatrix(){
+    /**
+     * Metoda wyrównuje różnice między wartościami komórek rzędu wprowadzonego do funkcji. Regulacja wyrównania
+     * za pomocą współczynnika wspolczynnik <0;50> zalecane wartości <5; 15>
+     * @param array_in rząd macierzy wejściowy
+     * @return wyrównany rząd
+     */
+    public double[] alignValueInMatrix(double[] array_in){
         //zmniejsza różnice między najbardziej i najmniej wyczuwalnym śladem feromonowym
+        //wyciąganie maxa i sumy z tablicy
+        double max = 0;
+        double sum = 0;
+        for (double x: array_in){
+            if (max<x) max = x;
+            sum+=x;
+        }
+        if (sum == 0){
+            return null;
+        }
+
+        double center_of_funkction = max/2;
+        double wspolczynnik = 5;
+        double a = wspolczynnik/(Math.pow(center_of_funkction,2));
+
+        double[] array_out = new double[array_in.length];
+        for (int i = 0; i<array_in.length; i++){
+            if (array_in[i] == 0){
+                array_out[i] = 0;
+            }else{
+                if (array_in[i] <center_of_funkction){
+                    array_out[i] = sum * ( (array_in[i]/sum) + ( (a * Math.pow((array_in[i]-center_of_funkction),2))/100));
+                }else {
+                    array_out[i] = sum * ( (array_in[i]/sum) - ( (a * Math.pow((array_in[i]-center_of_funkction),2))/100));
+                }
+
+            }
+        }
+        return array_out;
     }
 
     /**
