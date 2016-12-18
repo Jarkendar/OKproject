@@ -106,6 +106,9 @@ public class ProgramMain {
         feromonMatrix_machine1.addFeromonWay(mutant.getMachine1(),1);
         feromonMatrix_machine2.addFeromonWay(mutant.getMachine2(),1);
 
+        int[] step = feromonMatrix_machine1.useFeromonMatrix(2);
+        System.out.println("Z " + step[0] + " do " + step[1]);
+
         System.out.println("Tablica feromonowa 1");
         feromonMatrix_machine1.displayFeromonMatrix();
         System.out.println("Tablica feromonowa 2");
