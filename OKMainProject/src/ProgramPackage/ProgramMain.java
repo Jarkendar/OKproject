@@ -86,18 +86,18 @@ public class ProgramMain {
 //            mutant.displayMachine1();
 //            mutant.displayMachine2();
 //            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
-            if (testsClass.sprawdzNakładanieZadan(mutant)){
+            if (testsClass.sprawdzNakladanieZadan(mutant)){
                 System.out.println("Błąd");
             }
             System.out.println("Mutant "  + (1) );
             mutant.displayMachine1();
             mutant.displayMachine2();
             System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
-            System.out.println("Originał nakłada się "+testsClass.sprawdzNakładanieZadan(solution));
-            System.out.println("Mutant nakłada się "+testsClass.sprawdzNakładanieZadan(mutant));
+            System.out.println("Originał nakłada się "+testsClass.sprawdzNakladanieZadan(solution));
+            System.out.println("Mutant nakłada się "+testsClass.sprawdzNakladanieZadan(mutant));
 
-//        System.out.println("Originał nakłada się "+testsClass.sprawdzNakładanieZadan(solution));
-//        System.out.println("Mutant nakłada się "+testsClass.sprawdzNakładanieZadan(mutant));
+//        System.out.println("Originał nakłada się "+testsClass.sprawdzNakladanieZadan(solution));
+//        System.out.println("Mutant nakłada się "+testsClass.sprawdzNakladanieZadan(mutant));
 //        }
         long stopm = System.currentTimeMillis();
         System.out.println("Czas dla 1 000 000 mutacji "+ (stopm-startm) + " milis" );

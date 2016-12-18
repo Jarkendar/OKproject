@@ -35,12 +35,12 @@ public class FeromonMatrix {
     /**
      * Dodanie śladów feromonowych na ścieżce z rozwiązania
      * @param tasks - ścieżka rozwiązania
-     * @param współcznynnik - współczynnik wyliczany na podstawie porównania najlepszych roziązań
+     * @param wspolcznynnik - współczynnik wyliczany na podstawie porównania najlepszych roziązań
      */
-    public void addFeromonWay(LinkedList<Task> tasks, double współcznynnik){
+    public void addFeromonWay(LinkedList<Task> tasks, double wspolcznynnik){
         for (int i = 0; i<tasks.size()-1 ; i++){
             if (!(tasks.get(i).getTask_name().equals("maintanance")) && !(tasks.get(i+1).getTask_name().equals("maintanance"))){
-                addOneValueFeromonToWay(tasks.get(i).getNumber_task(), tasks.get(i+1).getNumber_task(), współcznynnik);
+                addOneValueFeromonToWay(tasks.get(i).getNumber_task(), tasks.get(i+1).getNumber_task(), wspolcznynnik);
             }
         }
     }
@@ -50,8 +50,8 @@ public class FeromonMatrix {
      * @param from - od nr zadania
      * @param to - do nr zdania
      */
-    private void addOneValueFeromonToWay(int from, int to, double współczynnik){
-        this.feromonMatrix[from-1][to-1] += 1*współczynnik; //wartość do ustalenie
+    private void addOneValueFeromonToWay(int from, int to, double wspolczynnik){
+        this.feromonMatrix[from-1][to-1] += 1*wspolczynnik; //wartość do ustalenie
     }
 
     /**
