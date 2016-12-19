@@ -113,10 +113,11 @@ public class FeromonMatrix {
         double[] array_of_section = new double[this.feromonMatrix[from].length];
         for (double x: array_of_section) x=0;
         double value_of_section = 0;
+        double[] array_align = this.alignValueInMatrix(feromonMatrix[from]);
 
-        for (int i=0; i<this.feromonMatrix[from].length; i++){
-            if (value_of_section<this.feromonMatrix[from][i]){
-                value_of_section+=this.feromonMatrix[from][i];
+        for (int i=0; i<array_align.length; i++){
+            if (value_of_section<array_align[i]){
+                value_of_section+=array_align[i];
                 array_of_section[i] = value_of_section;
             }else {
                 array_of_section[i] = value_of_section;
