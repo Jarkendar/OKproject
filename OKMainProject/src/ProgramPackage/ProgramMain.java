@@ -139,7 +139,21 @@ public class ProgramMain {
             System.out.format("%.2f ", x);
         }
         System.out.println();
+
+//********************TESTY GENERATORA Z MACIERZĄ FEROMONOWĄ ****************************
+        Task[] test_mutant_task = cloneTaskArray(tasks);
+        Maintanance[] test_mutant_maintanance = cloneMaintananceArray(maintanances);
+        Solution feromonmatrixgeneratortest = generatorWithFeromonMatrix(test_mutant_task,test_mutant_maintanance,feromonMatrix_machine1,feromonMatrix_machine2,300000, 150000);
+        feromonmatrixgeneratortest.displayMachine1();
+        feromonmatrixgeneratortest.displayMachine2();
+
+        if (testsClass.sprawdzNakladanieZadan(feromonmatrixgeneratortest)) {
+            System.out.println("Błąd");
+        }
+
     }
+
+
 
     /**
      * Metoda szuka komplementarnego zadania na przeciwnej maszynie
@@ -1023,6 +1037,609 @@ public class ProgramMain {
 
         Solution solution = new Solution(machine1,machine2);
     return solution;
+    }
+
+    /**
+     * Generator uwzględniający macierz feromonową. Buduję funkcję "prawdopodobieństwa", a następnie losuje wartość 0-100
+     * w zależności od wartości używa macierzy lub nie. Jeśli to robi to szuka następnego wierzchołka, jeśli takowy
+     * został już użyty to przechodzi do wstawienia losowego zadania z tablicy.
+     * @param tasks tablica zadań
+     * @param maintanances tablica przerw
+     * @param feromonMatrix1 macierz feromonowa dla maszyny nr 1
+     * @param feromonMatrix2 macierz feromonowa dla maszyny nr 2
+     * @param time_param czas do sparametryzowania
+     * @param actual_time aktualny czas; x w funkcji prawdopodobieństwa
+     * @return zwraca nowe rozwiązanie
+     */
+    private static Solution generatorWithFeromonMatrix(Task[] tasks, Maintanance[] maintanances
+            , FeromonMatrix feromonMatrix1, FeromonMatrix feromonMatrix2, long time_param, long actual_time){
+        LinkedList<Task> machine1 = new LinkedList<>();
+        LinkedList<Task> machine2 = new LinkedList<>();
+
+        Random random = new Random(System.currentTimeMillis());
+        /**
+         * Uwzględnienie wszystkich przerw w rozwiązaniu
+         */
+        boolean[] main_uses = new boolean[maintanances.length];
+        for (int i = 0 ; i< main_uses.length; i++) main_uses[i] = false;
+
+        while (checkAllTasksWasUses(main_uses)){
+            int wylosowana = random.nextInt(maintanances.length);
+
+            if (!main_uses[wylosowana]){
+                /**
+                 * na maszynie nr 1
+                 */
+                if (maintanances[wylosowana].getMachine_number() == 1){
+                    /**
+                     * jeśli lista jest jeszcze pusta
+                     */
+                    if (machine1.size() == 0){
+                        maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                        machine1.addFirst(maintanances[wylosowana]);
+                        main_uses[wylosowana] = true;
+                    }
+                    /**
+                     * jeśli na liście coś jest
+                     */
+                    else {
+                        for (int i = 0; i<machine1.size(); i++){
+                            /**
+                             * Zmieści się przed pierwszym zadaniem.
+                             */
+                            if (machine1.get(0).getTime_delay() > maintanances[wylosowana].getTime_delay()) {
+                                maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                                machine1.addFirst(maintanances[wylosowana]);
+                                main_uses[wylosowana] = true;
+                                break;
+                            }
+                            /**
+                             * Jeśli zmieści się pomiędzy dwoma zadaniami
+                             */
+                            else if (i < machine1.size()-1 && machine1.get(i).getTime_delay() > (maintanances[wylosowana].getTime_delay())) {
+                                maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                                machine1.add(i, maintanances[wylosowana]);
+                                main_uses[wylosowana] = true;
+                                break;
+                            }
+                            /**
+                             * Przejrzeliśmy całą maszynę
+                             */
+                            else if (i == machine1.size() - 1) {
+                                maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                                if (machine1.get(i).getTime_delay() > maintanances[wylosowana].getTime_delay()){
+                                    machine1.add(i, maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }else {
+                                    machine1.addLast(maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }else if (maintanances[wylosowana].getMachine_number() == 2){
+                    if (machine2.size() == 0){
+                        maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                        machine2.addFirst(maintanances[wylosowana]);
+                        main_uses[wylosowana] = true;
+                    }else {
+                        for (int i = 0; i<machine2.size(); i++){
+                            /**
+                             * Zmieści się przed pierwszym zadaniem.
+                             */
+                            if (machine2.get(0).getTime_delay() > maintanances[wylosowana].getTime_delay()) {
+                                maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                                machine2.addFirst(maintanances[wylosowana]);
+                                main_uses[wylosowana] = true;
+                                break;
+                            }
+                            /**
+                             * Jeśli zmieści się pomiędzy dwoma zadaniami
+                             */
+                            else if (i < machine2.size()-1 && machine2.get(i).getTime_delay() > (maintanances[wylosowana].getTime_delay())) {
+                                maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                                machine2.add(i, maintanances[wylosowana]);
+                                main_uses[wylosowana] = true;
+                                break;
+                            }
+                            /**
+                             * Przejrzeliśmy całą maszynę
+                             */
+                            else if (i == machine2.size() - 1) {
+                                maintanances[wylosowana].setTime_start(maintanances[wylosowana].getTime_delay());
+                                if (machine2.get(i).getTime_delay() > maintanances[wylosowana].getTime_delay()){
+                                    machine2.add(i,maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }else {
+                                    machine2.addLast(maintanances[wylosowana]);
+                                    main_uses[wylosowana] = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int instance_size = tasks.length/2;
+        boolean[] tasks_uses_test = new boolean[tasks.length];
+        for (int i = 0 ; i< tasks_uses_test.length; i++) tasks_uses_test[i] = false;
+
+        double a = (-100)/time_param;
+        double probability = a * actual_time + 100;
+        int previous_task = -1;
+        boolean use_random = false;
+
+
+        while (checkAllTasksWasUses(tasks_uses_test)) {
+            int check_option = random.nextInt(101);
+            use_random = false;
+            /**
+             * Jeśli jest większe, znaczy znajduje się nad osią wykresu funkcji to użyj macierzy feromonowej
+             * jeśli nie to używaj randoma
+             */
+            if (check_option > probability && previous_task != -1) {
+
+                int step[] = {-1, -1};
+                int next_task = -1;
+                //co ja tu robię ?
+                //wyciągam kolejną wartość z macierzy feromonowej i przypisuję jemu numer zadania z tablicy zadań
+                if (tasks[previous_task].getMachine_number() == 1) {
+                    step = feromonMatrix1.useFeromonMatrix(previous_task);
+                    if (step[1] != -1) {
+                        for (int i = 0; i < tasks.length; i++) {
+                            if (tasks[i].getNumber_task() == step[1] && tasks[previous_task].getMachine_number() == 1)
+                                next_task = i;
+                        }
+                    }
+                } else if (tasks[previous_task].getMachine_number() == 2) {
+                    step = feromonMatrix2.useFeromonMatrix(previous_task);
+                    if (step[1] != -1) {
+                        for (int i = 0; i < tasks.length; i++) {
+                            if (tasks[i].getNumber_task() == step[1] && tasks[previous_task].getMachine_number() == 2)
+                                next_task = i;
+                        }
+                    }
+                }
+
+                // okej, co mam ?  Mam numer kolejnego zadania, jego pozycję w tablicy, więć mogę sprawdzić czy zadanie już wystąpiło
+                if (next_task != -1 && !tasks_uses_test[next_task]) {
+                    if (tasks[next_task].getMachine_number() == 1) {
+                        int position_last_task = searchPositionLastTask(machine1);
+                        if (tasks[next_task].getTask_name().equals("part1")) {
+                            if (position_last_task == machine1.size() - 1) {
+                                if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                        >= tasks[next_task].getTime_delay()) {
+                                    tasks[next_task].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                } else {
+                                    tasks[next_task].setTime_start(tasks[next_task].getTime_delay());
+                                }
+                                tasks_uses_test[next_task] = true;
+                                machine1.addLast(tasks[next_task]);
+                                previous_task = next_task;
+                            } else {//za zadaniem jest jeszcze jakiś maintanance
+                                int i = 1;
+                                while (true) {
+                                    /**
+                                     * Wsadzenie pomiędzy zadania
+                                     */
+                                    if (position_last_task + i <= machine1.size() - 1) {
+                                        if (machine1.get(position_last_task + i - 1).getTime_start() + machine1.get(position_last_task + i - 1).getDuration()
+                                                >= tasks[next_task].getTime_delay()
+                                                && (machine1.get(position_last_task + i).getTime_start() - (machine1.get(position_last_task+ i - 1).getTime_start()
+                                                + machine1.get(position_last_task+ i - 1).getDuration())) >= tasks[next_task].getDuration()) {
+                                            tasks[next_task].setTime_start(machine1.get(position_last_task+ i - 1).getTime_start() + machine1.get(position_last_task+ i - 1).getDuration());
+                                            machine1.add(position_last_task+i,tasks[next_task]);
+                                            tasks_uses_test[next_task] = true;
+                                            previous_task = next_task;
+                                            break;
+                                        } else {
+                                            i++;
+                                        }
+                                    } else {
+                                        if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                                >= tasks[next_task].getTime_delay()) {
+                                            tasks[next_task].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                        } else {
+                                            tasks[next_task].setTime_start(tasks[next_task].getTime_delay());
+                                        }
+                                        tasks_uses_test[next_task] = true;
+                                        machine1.addLast(tasks[next_task]);
+                                        previous_task = next_task;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if (tasks[next_task].getTask_name().equals("part2")) {
+                            Task tmp = checkPartFirst(machine1, machine2, tasks[next_task].getNumber_task());
+                            int delay_time_part2 = 0;
+                            if (tmp != null) {
+                                delay_time_part2 = tmp.getTime_start() + tmp.getDuration();
+                                if (position_last_task == machine1.size() - 1) {
+                                    if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                            >= delay_time_part2) {
+                                        tasks[next_task].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                    } else {
+                                        tasks[next_task].setTime_start(delay_time_part2);
+                                    }
+                                    tasks_uses_test[next_task] = true;
+                                    machine1.addLast(tasks[next_task]);
+                                    previous_task = next_task;
+                                } else {//za zadaniem jest jeszcze jakiś maintanance
+                                    int i = 1;
+                                    while (true) {
+                                        /**
+                                         * Wsadzenie pomiędzy zadania
+                                         */
+                                        if (position_last_task + i <= machine1.size() - 1) {
+                                            if (machine1.get(position_last_task + i - 1).getTime_start() + machine1.get(position_last_task + i - 1).getDuration()
+                                                    >= delay_time_part2
+                                                    && (machine1.get(position_last_task + i).getTime_start() - (machine1.get(position_last_task+ i - 1).getTime_start()
+                                                    + machine1.get(position_last_task+ i - 1).getDuration())) >= tasks[next_task].getDuration()) {
+                                                tasks[next_task].setTime_start(machine1.get(position_last_task+ i - 1).getTime_start() + machine1.get(position_last_task+ i - 1).getDuration());
+                                                machine1.add(position_last_task+i,tasks[next_task]);
+                                                tasks_uses_test[next_task] = true;
+                                                previous_task = next_task;
+                                                break;
+                                            } else {
+                                                i++;
+                                            }
+                                        } else {
+                                            if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                                    >= delay_time_part2) {
+                                                tasks[next_task].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                            } else {
+                                                tasks[next_task].setTime_start(delay_time_part2);
+                                            }
+                                            tasks_uses_test[next_task] = true;
+                                            machine1.addLast(tasks[next_task]);
+                                            previous_task = next_task;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }else if (tasks[next_task].getMachine_number() == 2) {
+                            int position_last_task = searchPositionLastTask(machine2);
+
+                        if (tasks[next_task].getTask_name().equals("part1")) {
+                            if (position_last_task == machine2.size() - 1) {
+                                if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                        >= tasks[next_task].getTime_delay()) {
+                                    tasks[next_task].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                } else {
+                                    tasks[next_task].setTime_start(tasks[next_task].getTime_delay());
+                                }
+                                tasks_uses_test[next_task] = true;
+                                machine2.addLast(tasks[next_task]);
+                                previous_task = next_task;
+                            } else {//za zadaniem jest jeszcze jakiś maintanance
+                                int i = 1;
+                                while (true) {
+                                    /**
+                                     * Wsadzenie pomiędzy zadania
+                                     */
+                                    if (position_last_task + i <= machine2.size() - 1) {
+                                        if (machine2.get(position_last_task + i - 1).getTime_start() + machine2.get(position_last_task + i - 1).getDuration()
+                                                >= tasks[next_task].getTime_delay()
+                                                && (machine2.get(position_last_task + i).getTime_start() - (machine2.get(position_last_task+ i - 1).getTime_start()
+                                                + machine2.get(position_last_task+ i - 1).getDuration())) >= tasks[next_task].getDuration()) {
+                                            tasks[next_task].setTime_start(machine2.get(position_last_task+ i - 1).getTime_start() + machine2.get(position_last_task+ i - 1).getDuration());
+                                            machine2.add(position_last_task+i, tasks[next_task]);
+                                            tasks_uses_test[next_task] = true;
+                                            previous_task = next_task;
+                                            break;
+                                        } else {
+                                            i++;
+                                        }
+                                    } else {
+                                        if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                                >= tasks[next_task].getTime_delay()) {
+                                            tasks[next_task].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                        } else {
+                                            tasks[next_task].setTime_start(tasks[next_task].getTime_delay());
+                                        }
+                                        tasks_uses_test[next_task] = true;
+                                        machine2.addLast(tasks[next_task]);
+                                        previous_task = next_task;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if (tasks[next_task].getTask_name().equals("part2")) {
+                            Task tmp = checkPartFirst(machine1, machine2, tasks[next_task].getNumber_task());
+                            if (tmp != null) {
+                                int delay_time_part2 = tmp.getTime_start() + tmp.getDuration();
+                                if (position_last_task == machine2.size() - 1) {
+                                    if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                            >= delay_time_part2) {
+                                        tasks[next_task].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                    } else {
+                                        tasks[next_task].setTime_start(delay_time_part2);
+                                    }
+                                    tasks_uses_test[next_task] = true;
+                                    machine2.addLast(tasks[next_task]);
+                                    previous_task = next_task;
+                                } else {//za zadaniem jest jeszcze jakiś maintanance
+                                    int i = 1;
+                                    while (true) {
+                                        /**
+                                         * Wsadzenie pomiędzy zadania
+                                         */
+                                        if (position_last_task + i <= machine2.size() - 1) {
+                                            if (machine2.get(position_last_task + i - 1).getTime_start() + machine2.get(position_last_task + i - 1).getDuration()
+                                                    >= delay_time_part2
+                                                    && (machine2.get(position_last_task + i).getTime_start() - (machine2.get(position_last_task+ i - 1).getTime_start()
+                                                    + machine2.get(position_last_task+ i - 1).getDuration())) >= tasks[next_task].getDuration()) {
+                                                tasks[next_task].setTime_start(machine2.get(position_last_task+ i - 1).getTime_start() + machine2.get(position_last_task+ i - 1).getDuration());
+                                                machine2.add(position_last_task+i,tasks[next_task]);
+                                                tasks_uses_test[next_task] = true;
+                                                previous_task = next_task;
+                                                break;
+                                            } else {
+                                                i++;
+                                            }
+                                        } else {
+                                            if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                                    >= delay_time_part2) {
+                                                tasks[next_task].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                            } else {
+                                                tasks[next_task].setTime_start(delay_time_part2);
+                                            }
+                                            tasks_uses_test[next_task] = true;
+                                            machine2.addLast(tasks[next_task]);
+                                            previous_task = next_task;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    //jeśli było już użyte to generuj randoma
+                    use_random = true;
+                }
+            }
+
+
+            if (check_option <= probability || use_random) {
+                int wylosowana = random.nextInt(instance_size * 2);
+                /**
+                 * Wylosowana część pierwsza zadania
+                 */
+                if (!tasks_uses_test[wylosowana]) {
+                    if (tasks[wylosowana].getMachine_number() == 1) {
+                        int position_last_task = searchPositionLastTask(machine1);
+                        if (tasks[wylosowana].getTask_name().equals("part1")) {
+                            if (machine1.size() == 0) {
+                                tasks[wylosowana].setTime_start(tasks[wylosowana].getTime_delay());
+                                tasks_uses_test[wylosowana] = true;
+                                machine1.addFirst(tasks[wylosowana]);
+                            }else if (position_last_task == machine1.size() - 1) {
+                                if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                        >= tasks[wylosowana].getTime_delay()) {
+                                    tasks[wylosowana].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                } else {
+                                    tasks[wylosowana].setTime_start(tasks[wylosowana].getTime_delay());
+                                }
+                                tasks_uses_test[wylosowana] = true;
+                                machine1.addLast(tasks[wylosowana]);
+                                previous_task = wylosowana;
+                            } else {//za zadaniem jest jeszcze jakiś maintanance
+                                int i = 1;
+                                while (true) {
+                                    /**
+                                     * Wsadzenie pomiędzy zadania
+                                     */
+                                    if (position_last_task + i <= machine1.size() - 1) {
+                                        if (machine1.get(position_last_task + i - 1).getTime_start() + machine1.get(position_last_task + i - 1).getDuration()
+                                                >= tasks[wylosowana].getTime_delay()
+                                                && (machine1.get(position_last_task + i).getTime_start() - (machine1.get(position_last_task+ i - 1).getTime_start()
+                                                + machine1.get(position_last_task+ i - 1).getDuration())) >= tasks[wylosowana].getDuration()) {
+                                            tasks[wylosowana].setTime_start(machine1.get(position_last_task+ i - 1).getTime_start() + machine1.get(position_last_task+ i - 1).getDuration());
+                                            tasks_uses_test[wylosowana] = true;
+                                            machine1.add(position_last_task+i, tasks[wylosowana]);
+                                            previous_task = wylosowana;
+                                            break;
+                                        } else {
+                                            i++;
+                                        }
+                                    } else {
+                                        if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                                >= tasks[wylosowana].getTime_delay()) {
+                                            tasks[wylosowana].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                        } else {
+                                            tasks[wylosowana].setTime_start(tasks[wylosowana].getTime_delay());
+                                        }
+                                        tasks_uses_test[wylosowana] = true;
+                                        machine1.addLast(tasks[wylosowana]);
+                                        previous_task = wylosowana;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if (tasks[wylosowana].getTask_name().equals("part2")) {
+                            Task tmp = checkPartFirst(machine1, machine2, tasks[wylosowana].getNumber_task());
+                            if (tmp != null) {
+                                int delay_time_part2 = tmp.getTime_start() + tmp.getDuration();
+                                if (machine1.size() == 0) {
+                                    tasks[wylosowana].setTime_start(delay_time_part2);
+                                    tasks_uses_test[wylosowana] = true;
+                                    machine1.addFirst(tasks[wylosowana]);
+                                }else if (position_last_task == machine1.size() - 1) {
+                                    if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                            >= delay_time_part2) {
+                                        tasks[wylosowana].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                    } else {
+                                        tasks[wylosowana].setTime_start(delay_time_part2);
+                                    }
+                                    tasks_uses_test[wylosowana] = true;
+                                    machine1.addLast(tasks[wylosowana]);
+                                    previous_task = wylosowana;
+                                } else {//za zadaniem jest jeszcze jakiś maintanance
+                                    int i = 1;
+                                    while (true) {
+                                        /**
+                                         * Wsadzenie pomiędzy zadania
+                                         */
+                                        if (position_last_task + i <= machine1.size() - 1) {
+                                            if (machine1.get(position_last_task + i - 1).getTime_start() + machine1.get(position_last_task + i - 1).getDuration()
+                                                    >= delay_time_part2
+                                                    && (machine1.get(position_last_task + i).getTime_start() - (machine1.get(position_last_task+ i - 1).getTime_start()
+                                                    + machine1.get(position_last_task+ i - 1).getDuration())) >= tasks[wylosowana].getDuration()) {
+                                                tasks[wylosowana].setTime_start(machine1.get(position_last_task+ i - 1).getTime_start() + machine1.get(position_last_task+ i - 1).getDuration());
+                                                tasks_uses_test[wylosowana] = true;
+                                                machine1.add(position_last_task+i, tasks[wylosowana]);
+                                                previous_task = wylosowana;
+                                                break;
+                                            } else {
+                                                i++;
+                                            }
+                                        } else {
+                                            if (machine1.getLast().getTime_start() + machine1.getLast().getDuration()
+                                                    >= delay_time_part2) {
+                                                tasks[wylosowana].setTime_start(machine1.getLast().getTime_start() + machine1.getLast().getDuration());
+                                            } else {
+                                                tasks[wylosowana].setTime_start(delay_time_part2);
+                                            }
+                                            tasks_uses_test[wylosowana] = true;
+                                            machine1.addLast(tasks[wylosowana]);
+                                            previous_task = wylosowana;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }else if (tasks[wylosowana].getMachine_number() == 2) {
+                        int position_last_task = searchPositionLastTask(machine2);
+
+                        if (tasks[wylosowana].getTask_name().equals("part1")) {
+                            if (machine2.size() == 0) {
+                                tasks[wylosowana].setTime_start(tasks[wylosowana].getTime_delay());
+                                tasks_uses_test[wylosowana] = true;
+                                machine2.addFirst(tasks[wylosowana]);
+                            }else if (position_last_task == machine2.size() - 1) {
+                                if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                        >= tasks[wylosowana].getTime_delay()) {
+                                    tasks[wylosowana].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                } else {
+                                    tasks[wylosowana].setTime_start(tasks[wylosowana].getTime_delay());
+                                }
+                                tasks_uses_test[wylosowana] = true;
+                                machine2.addLast(tasks[wylosowana]);
+                                previous_task = wylosowana;
+                            } else {//za zadaniem jest jeszcze jakiś maintanance
+                                int i = 1;
+                                while (true) {
+                                    /**
+                                     * Wsadzenie pomiędzy zadania
+                                     */
+                                    if (position_last_task + i <= machine2.size() - 1) {
+                                        if (machine2.get(position_last_task + i - 1).getTime_start() + machine2.get(position_last_task + i - 1).getDuration()
+                                                >= tasks[wylosowana].getTime_delay()
+                                                && (machine2.get(position_last_task + i).getTime_start() - (machine2.get(position_last_task+ i - 1).getTime_start()
+                                                + machine2.get(position_last_task+ i - 1).getDuration())) >= tasks[wylosowana].getDuration()) {
+                                            tasks[wylosowana].setTime_start(machine2.get(position_last_task+ i - 1).getTime_start() + machine2.get(position_last_task+ i - 1).getDuration());
+                                            machine2.add(position_last_task+i,tasks[wylosowana]);
+                                            tasks_uses_test[wylosowana] = true;
+                                            previous_task = wylosowana;
+                                            break;
+                                        } else {
+                                            i++;
+                                        }
+                                    } else {
+                                        if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                                >= tasks[wylosowana].getTime_delay()) {
+                                            tasks[wylosowana].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                        } else {
+                                            tasks[wylosowana].setTime_start(tasks[wylosowana].getTime_delay());
+                                        }
+                                        tasks_uses_test[wylosowana] = true;
+                                        machine2.addLast(tasks[wylosowana]);
+                                        previous_task = wylosowana;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else if (tasks[wylosowana].getTask_name().equals("part2")) {
+                            Task tmp = checkPartFirst(machine1, machine2, tasks[wylosowana].getNumber_task());
+                            if (tmp != null) {
+                                int delay_time_part2 = tmp.getTime_start() + tmp.getDuration();
+                                if (machine2.size() == 0) {
+                                    tasks[wylosowana].setTime_start(delay_time_part2);
+                                    tasks_uses_test[wylosowana] = true;
+                                    machine2.addFirst(tasks[wylosowana]);
+                                }else if (position_last_task == machine2.size() - 1) {
+                                    if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                            >= delay_time_part2) {
+                                        tasks[wylosowana].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                    } else {
+                                        tasks[wylosowana].setTime_start(delay_time_part2);
+                                    }
+                                    tasks_uses_test[wylosowana] = true;
+                                    machine2.addLast(tasks[wylosowana]);
+                                    previous_task = wylosowana;
+                                } else {//za zadaniem jest jeszcze jakiś maintanance
+                                    int i = 1;
+                                    while (true) {
+                                        /**
+                                         * Wsadzenie pomiędzy zadania
+                                         */
+                                        if (position_last_task + i <= machine2.size() - 1) {
+                                            if (machine2.get(position_last_task + i - 1).getTime_start() + machine2.get(position_last_task + i - 1).getDuration()
+                                                    >= delay_time_part2
+                                                    && (machine2.get(position_last_task + i).getTime_start() - (machine2.get(position_last_task+ i - 1).getTime_start()
+                                                    + machine2.get(position_last_task+ i - 1).getDuration())) >= tasks[wylosowana].getDuration()) {
+                                                tasks[wylosowana].setTime_start(machine2.get(position_last_task+ i - 1).getTime_start() + machine2.get(position_last_task+ i - 1).getDuration());
+                                                tasks_uses_test[wylosowana] = true;
+                                                machine2.add(position_last_task+i,tasks[wylosowana]);
+                                                previous_task = wylosowana;
+                                                break;
+                                            } else {
+                                                i++;
+                                            }
+                                        } else {
+                                            if (machine2.getLast().getTime_start() + machine2.getLast().getDuration()
+                                                    >= delay_time_part2) {
+                                                tasks[wylosowana].setTime_start(machine2.getLast().getTime_start() + machine2.getLast().getDuration());
+                                            } else {
+                                                tasks[wylosowana].setTime_start(delay_time_part2);
+                                            }
+                                            tasks_uses_test[wylosowana] = true;
+                                            machine2.addLast(tasks[wylosowana]);
+                                            previous_task = wylosowana;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Solution solution = new Solution(machine1,machine2);
+        return solution;
+    }
+
+    /**
+     * Metoda szuka pozycji ostatniego zadania na liście maszyny
+     * @param machine lista maszyny
+     * @return zwraca pozycję na maszynie
+     */
+    private static int searchPositionLastTask(LinkedList<Task> machine){
+        int last_index = 0;
+        for (int i =0 ; i<machine.size();i++){
+            if (!machine.get(i).getTask_name().equals("maintanance")) last_index = i;
+        }
+        return last_index;
     }
 
     /**
