@@ -147,6 +147,10 @@ public class ProgramMain {
         feromonmatrixgeneratortest.displayMachine1();
         feromonmatrixgeneratortest.displayMachine2();
 
+        if (testsClass.sprawdzNakladanieZadan(feromonmatrixgeneratortest)) {
+            System.out.println("Błąd");
+        }
+
     }
 
 
