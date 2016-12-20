@@ -1191,7 +1191,6 @@ public class ProgramMain {
 
                 // okej, co mam ?  Mam numer kolejnego zadania, jego pozycję w tablicy, więć mogę sprawdzić czy zadanie już wystąpiło
                 if (next_task != -1 && !tasks_uses_test[next_task]) {
-                    //TODO kod na dodawanie na kolejne miejsce
                     if (tasks[next_task].getMachine_number() == 1) {
                         int position_last_task = searchPositionLastTask(machine1);
                         if (tasks[next_task].getTask_name().equals("part1")) {
