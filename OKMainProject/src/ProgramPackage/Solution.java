@@ -24,7 +24,7 @@ public class Solution {
     public Solution(LinkedList<Task> machine1, LinkedList<Task> machine2) {
         this.setMachine1(machine1);
         this.setMachine2(machine2);
-
+        setFunction_target();
     }
 
     /**
