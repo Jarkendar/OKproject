@@ -153,6 +153,25 @@ public class ProgramMain {
 
     }
 
+    /**
+     * Metoda turnieju, przeprowadza tyle walk ile trzeba, aby populacja wyniku zmniejszyła się do rządanej wartości
+     * @param solutions lista rozwiązań z populacją
+     * @param limit liczność populacji po turnieju
+     */
+    private static void theHungryGames(LinkedList<Solution> solutions, int limit){
+        Random random = new Random(System.currentTimeMillis());
+        while (solutions.size()>limit){
+            int warrior_nr1 = random.nextInt(solutions.size());
+            int warrior_nr2 = random.nextInt(solutions.size());
+
+            if (solutions.get(warrior_nr1).getFunction_target() > solutions.get(warrior_nr2).getFunction_target()){
+                solutions.remove(warrior_nr1);
+            }else {
+                solutions.remove(warrior_nr2);
+            }
+
+        }
+    }
 
 
     /**
