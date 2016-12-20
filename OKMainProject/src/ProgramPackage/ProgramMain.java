@@ -1039,6 +1039,18 @@ public class ProgramMain {
     return solution;
     }
 
+    /**
+     * Generator uwzględniający macierz feromonową. Buduję funkcję "prawdopodobieństwa", a następnie losuje wartość 0-100
+     * w zależności od wartości używa macierzy lub nie. Jeśli to robi to szuka następnego wierzchołka, jeśli takowy
+     * został już użyty to przechodzi do wstawienia losowego zadania z tablicy.
+     * @param tasks tablica zadań
+     * @param maintanances tablica przerw
+     * @param feromonMatrix1 macierz feromonowa dla maszyny nr 1
+     * @param feromonMatrix2 macierz feromonowa dla maszyny nr 2
+     * @param time_param czas do sparametryzowania
+     * @param actual_time aktualny czas; x w funkcji prawdopodobieństwa
+     * @return zwraca nowe rozwiązanie
+     */
     private static Solution generatorWithFeromonMatrix(Task[] tasks, Maintanance[] maintanances
             , FeromonMatrix feromonMatrix1, FeromonMatrix feromonMatrix2, long time_param, long actual_time){
         LinkedList<Task> machine1 = new LinkedList<>();
