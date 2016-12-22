@@ -194,7 +194,7 @@ public class MainGenerator {
             boolean machine = false;
             time1 = random.nextInt(max_task_time) + 1;
             time2 = random.nextInt(max_task_time) + 1;
-            all_time += time1/4;
+            all_time += time1;
             rdy_time1 = random.nextInt(all_time + 1);
             machine = random.nextBoolean();
             if (machine){
