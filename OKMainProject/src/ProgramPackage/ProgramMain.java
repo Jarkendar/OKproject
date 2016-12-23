@@ -7,6 +7,7 @@ import ProgramPackage.TaskPackage.Task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
@@ -34,125 +35,192 @@ public class ProgramMain {
         count_object = size;
         count_maintanance = 1 + size/8;
 
-
 //*******************WCZYTANIE INSTANCJI Z PLIKU************************
-        //mierzenie czasu start
+
+        //tworzenie ścieżki do plików
+        path_to_instance = createPathToInstance(size, inscance_number);
+        //wczytanie tablicy zadań i przerw z pliku
+        Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
+        Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
+
+        String filepath = "Wyniki\\rozmiar " + size;
+        File folder = new File(filepath);
+        folder.mkdir();
+//**********************FUNKCJA GŁÓWNA ***************************************
+        int count_in_instance = 25;
+        int count_mutant_in_iteration = 5;
+        LinkedList<Solution> solutions = new LinkedList<>();
+        FeromonMatrix feromonMatrix1 = new FeromonMatrix(size);
+        FeromonMatrix feromonMatrix2 = new FeromonMatrix(size);
+
+        for(int i = 0 ; i<count_in_instance; i++){
+            Task[] task_clone = cloneTaskArray(tasks);
+            Maintanance[] maintanance_clone = cloneMaintananceArray(maintanances);
+            Solution sol_from_generate = generatorV2(task_clone,maintanance_clone);
+            solutions.addLast(sol_from_generate);
+        }
+        //potrzebne do wygenerowania pliku wyjściowego
+        int time_random_solution = solutions.getFirst().getFunction_target();
+
         long start = System.currentTimeMillis();
-//        for (int l = 5; l<=50 ; l+=5) {
-//            size = l;
-//            for (int j =1; j<=100; j++) {
-//                inscance_number = j;
-//                System.out.println("size " + size+ " numer instancji "+ inscance_number);
-                //tworzenie ścieżki do plików
-                path_to_instance = createPathToInstance(size, inscance_number);
-//                count_object =size;
-                //wczytanie tablicy zadań i przerw z pliku
-                Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
-                Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
-
-//*******************TESTY RANDOM GENERATORA******************************
-                /**
-                 * Tworzenie instancji wejściowych i wypełnieniej jej losowymi rozwiązaniami
-                 */
-                Solution solution = null;
-
-                    //kopiowanie głębokie obiektów z tablicy zadań
-                    Task[] tasks_clone = cloneTaskArray(tasks);
-                    //kopiowanie głębokie obiektów maintanance
-                    Maintanance[] maintanances_clone = cloneMaintananceArray(maintanances);
-
-                    solution = generatorV2(tasks_clone, maintanances_clone);
-
-                    solution.setFunction_target();
-        //wyświetlenie originału
-//        solution.displayMachine1();
-//        solution.displayMachine2();
-//        System.out.println("Czas funkcji celu : " + solution.getFunction_target());
-
-//***********************TESTY MUTANTÓW*****************************
-        //stworzenie i wyświetlenie klona
-        Solution clone_solution = solution.cloneSolution();
-//        clone_solution.displayMachine1();
-//        clone_solution.displayMachine2();
-//        System.out.println("Czas funkcji celu : " + clone_solution.getFunction_target());
-
-        //wywołanie funkcji mutacji
-        long startm = System.currentTimeMillis();
-        for (int i = 0; i<100; i++) {
-            Task[] test_mutant_task = cloneTaskArray(tasks);
-            Maintanance[] test_mutant_maintanance = cloneMaintananceArray(maintanances);
-            Solution mutant = createMutantSolution(clone_solution, size, test_mutant_task, test_mutant_maintanance);
-//            System.out.println("Mutant "  +(i+1));
-//            mutant.displayMachine1();
-//            mutant.displayMachine2();
-//            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
-            if (testsClass.sprawdzNakladanieZadan(mutant)) {
-                System.out.println("Błąd");
+        long stop = start;
+        long max_time = 600000;
+        while (stop-start < max_time){
+    //******************************TWORZENIE POPULACJI*************
+            if (stop-start < max_time*0.2){
+                for (int k = 0; k<count_in_instance; k++) {
+                    for (int i = 0; i < count_mutant_in_iteration; i++) {
+                        Task[] task_clone = cloneTaskArray(tasks);
+                        Maintanance[] maintanance_clone = cloneMaintananceArray(maintanances);
+                        Solution mutant_solution = createMutantSolution(solutions.get(k),size,task_clone,maintanance_clone);
+                        solutions.addLast(mutant_solution);
+                    }
+                }
+            }else {
+                for (int i = 0; i<count_in_instance*5; i++){
+                    Task[] task_clone = cloneTaskArray(tasks);
+                    Maintanance[] maintanance_clone = cloneMaintananceArray(maintanances);
+                    Solution solution_feromon = generatorWithFeromonMatrix(task_clone, maintanance_clone,feromonMatrix1, feromonMatrix2,max_time, (stop-start));
+                    solutions.addLast(solution_feromon);
+                }
             }
-//            System.out.println("Mutant "  + (1) );
-//            mutant.displayMachine1();
-//            mutant.displayMachine2();
-//            System.out.println("Czas funkcji celu : " + mutant.getFunction_target());
-//            System.out.println("Originał nakłada się "+testsClass.sprawdzNakladanieZadan(solution));
-//            System.out.println("Mutant nakłada się "+testsClass.sprawdzNakladanieZadan(mutant));
 
-//        System.out.println("Originał nakłada się "+testsClass.sprawdzNakladanieZadan(solution));
-//        System.out.println("Mutant nakłada się "+testsClass.sprawdzNakladanieZadan(mutant));
-//        }
-//        long stopm = System.currentTimeMillis();
-//        System.out.println("Czas dla 100 mutacji "+ (stopm-startm) + " milis" );
+        //***************IGRZYSKA************************
+            theHungryGames(solutions,count_in_instance);
 
-//**********************TESTY MACIERZY FEROMONOWYCH********************************
-            feromonMatrix_machine1.addFeromonWay(mutant.getMachine1(), 1);
-            feromonMatrix_machine2.addFeromonWay(mutant.getMachine2(), 1);
+        //***************SZUKANIE NAJMNIEJSZEGO**************
+            int min = Integer.MAX_VALUE;
+            for (int i = 0; i<count_in_instance; i++){
+                if (solutions.get(i).getFunction_target()<min) {
+                    min = solutions.get(i).getFunction_target();
+                }
+            }
 
-            int[] step = feromonMatrix_machine1.useFeromonMatrix(2);
-            System.out.println("Z " + step[0] + " do " + step[1]);
+        //****************WYPEŁNIANIE MACIERZY FEROMONOWEJ************
+            for (int i = 0; i<count_in_instance; i++){
+                feromonMatrix1.addFeromonWay(solutions.get(i).getMachine1(), (double)(min/solutions.get(i).getFunction_target()));
+                feromonMatrix2.addFeromonWay(solutions.get(i).getMachine2(), (double)(min/solutions.get(i).getFunction_target()));
+            }
 
-//            System.out.println("Tablica feromonowa 1");
-//            feromonMatrix_machine1.displayFeromonMatrix();
-//            System.out.println("Tablica feromonowa 2");
-//            feromonMatrix_machine2.displayFeromonMatrix();
+        //****************USTAWIENIE CZASU AKTUALNEGO*************
+            stop = System.currentTimeMillis();
 
-//        for (int i = 0 ;i<10; i++){
-            feromonMatrix_machine1.evaporationFeromonWay();
-            feromonMatrix_machine2.evaporationFeromonWay();
-//        }
+            feromonMatrix1.evaporationFeromonWay();
+            feromonMatrix2.evaporationFeromonWay();
         }
-        long stopm = System.currentTimeMillis();
-        System.out.println("Czas dla 100 mutacji "+ (stopm-startm) + " milis" );
-        System.out.println("Tablica feromonowa 1");
-        feromonMatrix_machine1.displayFeromonMatrix();
-        System.out.println("Tablica feromonowa 2");
-        feromonMatrix_machine2.displayFeromonMatrix();
 
-//*********************TESTY FUNKCJI WYRÓWNUJĄCEJ RÓŻNICE W RZĘDZIE MACIERZY*************
-        double[] array_in = {0,10,15,30,50,1000};
-        double[] array_out = feromonMatrix_machine1.alignValueInMatrix(array_in);
+        //*****************WYCIĄGNIĘCIE NAJLEPSZEGO**************
+        theHungryGames(solutions,1);
 
-        System.out.println("Tablica wejściowa ");
-        for (double x: array_in){
-            System.out.format("%.2f ", x);
-        }
-        System.out.println("\nTablica wyjściowa ");
-        for (double x: array_out){
-            System.out.format("%.2f ", x);
-        }
-        System.out.println();
+        int time_metaheuristic_solution = solutions.getFirst().getFunction_target();
 
-//********************TESTY GENERATORA Z MACIERZĄ FEROMONOWĄ ****************************
-        Task[] test_mutant_task = cloneTaskArray(tasks);
-        Maintanance[] test_mutant_maintanance = cloneMaintananceArray(maintanances);
-        Solution feromonmatrixgeneratortest = generatorWithFeromonMatrix(test_mutant_task,test_mutant_maintanance,feromonMatrix_machine1,feromonMatrix_machine2,300000, 150000);
-        feromonmatrixgeneratortest.displayMachine1();
-        feromonmatrixgeneratortest.displayMachine2();
-
-        if (testsClass.sprawdzNakladanieZadan(feromonmatrixgeneratortest)) {
-            System.out.println("Błąd");
-        }
+        saveInstanceToFile(solutions.getFirst(),size, inscance_number, time_random_solution, time_metaheuristic_solution, maintanances);
 
     }
 
+    /**
+     * Metoda zapisu instancji do pliku wyjściowego, w katalogu Wyniki
+     * @param solution - rozwiązanie ostateczne
+     * @param size - rozmiar instancji
+     * @param nr - numer instancji liczonej
+     * @param time_random - czas rozwiązania randomowego
+     * @param time_metaheuristic - czas rozwiązania metaheurystyki
+     * @param maintanances - tablica przerw na potrzeby zapisu
+     */
+    private static void saveInstanceToFile(Solution solution , int size, int nr, int time_random, int time_metaheuristic, Maintanance[] maintanances){
+        //folder główny projektu\Wyniki\rozmiar x\nr i.txt
+        //głowica zapisująca do pliku.
+        String filename = "Wyniki\\rozmiar "+size+ "\\nr "+ nr +".txt";
+        PrintWriter printWriter = null;
+
+        try {
+            printWriter = new PrintWriter(filename);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        printWriter.println("*******"+nr+"*******");
+        printWriter.println(time_metaheuristic + ", "+ time_random);
+
+        int tmp = 0;
+        int time_idle1 = 0;
+        int time_idle2 = 0;
+        int maintanance_time_M1 = 0;
+        int maintanance_time_M2 = 0;
+//***************ZAPIS MASZYN**********************
+        printWriter.print("M1: ");
+        int i =0;
+        while (i< solution.getMachine1().size()){
+            if (tmp == solution.getMachine1().get(i).getTime_start()) {
+                printWriter.print(solution.getMachine1().get(i).getTask_name()
+                        + "_" + solution.getMachine1().get(i).getNumber_task() + ", "
+                        + solution.getMachine1().get(i).getTime_start() + ", "
+                        + solution.getMachine1().get(i).getDuration() + "; ");
+                tmp = solution.getMachine1().get(i).getTime_start() + solution.getMachine1().get(i).getDuration();
+                i++;
+            }else if (tmp < solution.getMachine1().get(i).getTime_start()){
+                printWriter.print("idle1_M1, "+ tmp+", "+(solution.getMachine1().get(i).getTime_start()-tmp)+"; ");
+                time_idle1 = time_idle1 + (solution.getMachine1().get(i).getTime_start()-tmp);
+                tmp = solution.getMachine1().get(i).getTime_start();
+            }
+        }
+
+        tmp = i = 0;
+        printWriter.println("");
+        printWriter.print("M2: ");
+        while (i< solution.getMachine2().size()){
+            if (tmp == solution.getMachine2().get(i).getTime_start()) {
+                printWriter.print(solution.getMachine2().get(i).getTask_name()
+                        + "_" + solution.getMachine2().get(i).getNumber_task() + ", "
+                        + solution.getMachine2().get(i).getTime_start() + ", "
+                        + solution.getMachine2().get(i).getDuration() + "; ");
+                tmp = solution.getMachine2().get(i).getTime_start() + solution.getMachine2().get(i).getDuration();
+                i++;
+            }else if (tmp < solution.getMachine2().get(i).getTime_start()){
+                printWriter.print("idle2_M2, "+ tmp+", "+(solution.getMachine2().get(i).getTime_start()-tmp)+"; ");
+                time_idle2 = time_idle2 + (solution.getMachine2().get(i).getTime_start()-tmp);
+                tmp = solution.getMachine2().get(i).getTime_start();
+            }
+        }
+//******************OBLICZENIE CZASU MAINTANANCE I ZAPIS DO PLIKU OSTATNICH 4 LINII *****************
+        for (Maintanance x: maintanances){
+            if (x.getMachine_number() == 1){
+                maintanance_time_M1 += x.getDuration();
+            }else if (x.getMachine_number() == 2){
+                maintanance_time_M2 += x.getDuration();
+            }
+        }
+        printWriter.println("\n" + time_idle1);
+        printWriter.println(time_idle2);
+        printWriter.println(maintanance_time_M1);
+        printWriter.println(maintanance_time_M2);
+
+
+        printWriter.println("********* EOF **********");
+        printWriter.close();
+    }
+
+
+    /**
+     * Metoda turnieju, przeprowadza tyle walk ile trzeba, aby populacja wyniku zmniejszyła się do rządanej wartości
+     * @param solutions lista rozwiązań z populacją
+     * @param limit liczność populacji po turnieju
+     */
+    private static void theHungryGames(LinkedList<Solution> solutions, int limit){
+        Random random = new Random(System.currentTimeMillis());
+        while (solutions.size()>limit){
+            int warrior_nr1 = random.nextInt(solutions.size());
+            int warrior_nr2 = random.nextInt(solutions.size());
+
+            if (warrior_nr1 != warrior_nr2) {
+                if (solutions.get(warrior_nr1).getFunction_target() > solutions.get(warrior_nr2).getFunction_target()) {
+                    solutions.remove(warrior_nr1);
+                } else {
+                    solutions.remove(warrior_nr2);
+                }
+            }
+        }
+    }
 
 
     /**
@@ -182,6 +250,15 @@ public class ProgramMain {
         return -1;
     }
 
+    /**
+     * Metoda tworzy mutanty, poprzez odczyt kolejności zamianę na maszynie dwóch zadań tego samego typu miejscami
+     * i odwrócenie kolejności zadań komplementarnych na drugiej maszynie, aby uniknąć deadlock'a.
+     * @param presolution rozwiązanie "matka"
+     * @param count_task rozmiar instancji
+     * @param tasks tablica zadań
+     * @param maintanances tablica przerw
+     * @return zwraca zupełnie nowe rozwiązanie ze zmienioną kolejnością zadań na maszynach
+     */
     private static Solution createMutantSolution(Solution presolution, int count_task, Task[] tasks, Maintanance[] maintanances){
         // oznaczenia komórek tworzonej tabeli
         // <1;count_task> - części pierwsze zadań
@@ -212,8 +289,6 @@ public class ProgramMain {
             }
         }
 
-//        displayArray(array_of_sequence_machine1,array_of_sequence_machine2);
-
         //zamiana miejsc
         Random random = new Random(System.currentTimeMillis());
         boolean check = true;
@@ -234,7 +309,6 @@ public class ProgramMain {
                             && array_of_sequence_machine1[choose2] > 0
                             && array_of_sequence_machine1[choose1] <= count_task
                             && array_of_sequence_machine1[choose2] <= count_task) {
-//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine1[choose1];
                         array_of_sequence_machine1[choose1] = array_of_sequence_machine1[choose2];
                         array_of_sequence_machine1[choose2] = tmp;
@@ -246,12 +320,8 @@ public class ProgramMain {
                         tmp = array_of_sequence_machine2[ch2];
                         array_of_sequence_machine2[ch2] = array_of_sequence_machine2[ch3];
                         array_of_sequence_machine2[ch3] = tmp;
-
-//                        System.out.println("maszyna 1 zamiana części pierwszej");
-//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     } else if (array_of_sequence_machine1[choose1] > count_task
                             && array_of_sequence_machine1[choose2] > count_task) {
-//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine1[choose1];
                         array_of_sequence_machine1[choose1] = array_of_sequence_machine1[choose2];
                         array_of_sequence_machine1[choose2] = tmp;
@@ -263,9 +333,6 @@ public class ProgramMain {
                         tmp = array_of_sequence_machine2[ch2];
                         array_of_sequence_machine2[ch2] = array_of_sequence_machine2[ch3];
                         array_of_sequence_machine2[ch3] = tmp;
-
-//                        System.out.println("maszyna 1 zamiana części drugiej");
-//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     }
                 }
             }
@@ -279,7 +346,6 @@ public class ProgramMain {
                             && array_of_sequence_machine2[choose2] > 0
                             && array_of_sequence_machine2[choose1] <= count_task
                             && array_of_sequence_machine2[choose2] <= count_task) {
-//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine2[choose1];
                         array_of_sequence_machine2[choose1] = array_of_sequence_machine2[choose2];
                         array_of_sequence_machine2[choose2] = tmp;
@@ -291,12 +357,8 @@ public class ProgramMain {
                         tmp = array_of_sequence_machine1[ch2];
                         array_of_sequence_machine1[ch2] = array_of_sequence_machine1[ch3];
                         array_of_sequence_machine1[ch3] = tmp;
-
-//                        System.out.println("maszyna 2 zamiana części pierwszej");
-//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     } else if (array_of_sequence_machine2[choose1] > count_task
                             && array_of_sequence_machine2[choose2] > count_task) {
-//                        System.out.println(choose1 + " " + choose2);
                         int tmp = array_of_sequence_machine2[choose1];
                         array_of_sequence_machine2[choose1] = array_of_sequence_machine2[choose2];
                         array_of_sequence_machine2[choose2] = tmp;
@@ -308,9 +370,6 @@ public class ProgramMain {
                         tmp = array_of_sequence_machine1[ch2];
                         array_of_sequence_machine1[ch2] = array_of_sequence_machine1[ch3];
                         array_of_sequence_machine1[ch3] = tmp;
-
-//                        System.out.println("maszyna 2 zamiana części drugiej");
-//                        displayArray(array_of_sequence_machine1, array_of_sequence_machine2);
                     }
                 }
             }
@@ -1168,19 +1227,24 @@ public class ProgramMain {
         boolean[] tasks_uses_test = new boolean[tasks.length];
         for (int i = 0 ; i< tasks_uses_test.length; i++) tasks_uses_test[i] = false;
 
-        double a = (-100)/time_param;
-        double probability = a * actual_time + 100;
+        double a = (-100.0)/time_param;
+//        System.out.println("a wynosi " + a);
+        double probability = a * actual_time + 100.0;
         int previous_task = -1;
         boolean use_random = false;
 
 
         while (checkAllTasksWasUses(tasks_uses_test)) {
-            int check_option = random.nextInt(101);
+            double check_option = random.nextDouble() * 100.0;
             use_random = false;
             /**
              * Jeśli jest większe, znaczy znajduje się nad osią wykresu funkcji to użyj macierzy feromonowej
              * jeśli nie to używaj randoma
              */
+//            System.out.println("First");
+//            System.out.println(check_option + " " + probability);
+//            System.out.println("Second");
+//            System.out.println(previous_task);
             if (check_option > probability && previous_task != -1) {
 
                 int step[] = {-1, -1};
@@ -1188,7 +1252,7 @@ public class ProgramMain {
                 //co ja tu robię ?
                 //wyciągam kolejną wartość z macierzy feromonowej i przypisuję jemu numer zadania z tablicy zadań
                 if (tasks[previous_task].getMachine_number() == 1) {
-                    step = feromonMatrix1.useFeromonMatrix(previous_task);
+                    step = feromonMatrix1.useFeromonMatrix(tasks[previous_task].getNumber_task()-1);
                     if (step[1] != -1) {
                         for (int i = 0; i < tasks.length; i++) {
                             if (tasks[i].getNumber_task() == step[1] && tasks[previous_task].getMachine_number() == 1)
@@ -1196,7 +1260,7 @@ public class ProgramMain {
                         }
                     }
                 } else if (tasks[previous_task].getMachine_number() == 2) {
-                    step = feromonMatrix2.useFeromonMatrix(previous_task);
+                    step = feromonMatrix2.useFeromonMatrix(tasks[previous_task].getNumber_task()-1);
                     if (step[1] != -1) {
                         for (int i = 0; i < tasks.length; i++) {
                             if (tasks[i].getNumber_task() == step[1] && tasks[previous_task].getMachine_number() == 2)
@@ -1405,8 +1469,6 @@ public class ProgramMain {
                     use_random = true;
                 }
             }
-
-
             if (check_option <= probability || use_random) {
                 int wylosowana = random.nextInt(instance_size * 2);
                 /**

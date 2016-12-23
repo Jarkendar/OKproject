@@ -70,7 +70,7 @@ public class MainGenerator {
             e.printStackTrace();
         }
 
-        printWriter.println("*******"+nr+"*******");
+        printWriter.println("*******"+(nr+1)+"*******");
         printWriter.println("liczba zadań " + size);
 
         for (Task x: tasks) {
@@ -194,7 +194,7 @@ public class MainGenerator {
             boolean machine = false;
             time1 = random.nextInt(max_task_time) + 1;
             time2 = random.nextInt(max_task_time) + 1;
-            all_time += time1/4;
+            all_time += time1;
             rdy_time1 = random.nextInt(all_time + 1);
             machine = random.nextBoolean();
             if (machine){

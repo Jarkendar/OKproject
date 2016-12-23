@@ -110,7 +110,7 @@ public class FeromonMatrix {
      * @return - zwraca komórkę dokąd lub -1 w wypadku rzędu z zerami
      */
     private int ruleteAlgorithm(int from){
-        double[] array_of_section = new double[this.feromonMatrix[from].length];
+        double[] array_of_section = new double[feromonMatrix[from].length];
         for (double x: array_of_section) x=0;
         double value_of_section = 0;
         double[] array_align = this.alignValueInMatrix(feromonMatrix[from]);
@@ -132,14 +132,14 @@ public class FeromonMatrix {
         for (int i =0; i<array_of_section.length; i++){
             if (i == 0){
                 if (array_of_section[0] != 0 && array_of_section[0]>= choose_value){
-                    System.out.println(feromonMatrix[from][i]);
+//                    System.out.println(feromonMatrix[from][i]);
                     return i;
                 }
             }
             else if (array_of_section[i-1] != array_of_section[i]
                     && array_of_section[i-1]<choose_value
                     && array_of_section[i] >= choose_value){
-                System.out.println(feromonMatrix[from][i]);
+//                System.out.println(feromonMatrix[from][i]);
                 return i;
             }
         }
