@@ -70,7 +70,7 @@ public class MainGenerator {
             e.printStackTrace();
         }
 
-        printWriter.println("*******"+nr+"*******");
+        printWriter.println("*******"+(nr+1)+"*******");
         printWriter.println("liczba zadań " + size);
 
         for (Task x: tasks) {
