@@ -16,6 +16,14 @@ import java.util.Scanner;
  * Created by Jarek on 2016-12-06.
  */
 public class ProgramMain {
+    //PARAMETRY:
+    //liczba mutantów po każdej iteracji -> 56                                  DEFAULT = 4
+    //maksymalny czas pracy w ms -> 73                                          DEFAULT = 300 000
+    //współczynni wygładzenia macierzy feromonowej -> FeromonMatrix.java -> 51  DEFAULT = 5
+    //współczynni parowania macierzy -> FeromonMatrix.java -> 170               DEFAULT = 0.95
+
+
+
     public static void main(String[] args) {
         TestsClass testsClass = new TestsClass();
 
@@ -64,7 +72,7 @@ public class ProgramMain {
 
         long start = System.currentTimeMillis();
         long stop = start;
-        long max_time = 600000;
+        long max_time = 60000;
         while (stop-start < max_time){
     //******************************TWORZENIE POPULACJI*************
             if (stop-start < max_time*0.2){
