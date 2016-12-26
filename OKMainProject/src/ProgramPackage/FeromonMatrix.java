@@ -52,6 +52,7 @@ public class FeromonMatrix {
         double a = wspolczynnik/(Math.pow(center_of_funkction,2));
 
         double[] array_out = new double[array_in.length];
+        for (double x : array_out) x = 0;
         for (int i = 0; i<array_in.length; i++){
             if (array_in[i] == 0){
                 array_out[i] = 0;
@@ -110,10 +111,11 @@ public class FeromonMatrix {
      * @return - zwraca komórkę dokąd lub -1 w wypadku rzędu z zerami
      */
     private int ruleteAlgorithm(int from){
-        double[] array_of_section = new double[feromonMatrix[from].length];
-        for (double x: array_of_section) x=0;
         double value_of_section = 0;
         double[] array_align = this.alignValueInMatrix(feromonMatrix[from]);
+        if (array_align == null) return -1;
+        double[] array_of_section = new double[array_align.length];
+        for (double x: array_of_section) x=0.0;
 
         for (int i=0; i<array_align.length; i++){
             if (value_of_section<array_align[i]){
@@ -167,7 +169,7 @@ public class FeromonMatrix {
                 /**
                  * Współcznynnik parowania do ustalenia
                  */
-                this.feromonMatrix[i][k] *= 0.9;
+                this.feromonMatrix[i][k] *= 0.97;
             }
         }
     }
