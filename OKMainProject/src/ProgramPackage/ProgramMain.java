@@ -83,7 +83,7 @@ public class ProgramMain {
 
             long start = System.currentTimeMillis();
             long stop = start;
-            long max_time = 6000;
+            long max_time = 60000;
             while (stop - start < max_time) {
                 //******************************TWORZENIE POPULACJI*************
                 if (stop - start < max_time * 0.2) {
