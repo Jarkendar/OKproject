@@ -17,10 +17,10 @@ import java.util.Scanner;
  */
 public class ProgramMain {
     //PARAMETRY:
-    //liczba mutantów po każdej iteracji -> 56                                  DEFAULT = 4         AFTER = 5
-    //maksymalny czas pracy w ms -> 73                                          DEFAULT = 300 000   AFTER = 60 000
-    //współczynni wygładzenia macierzy feromonowej -> FeromonMatrix.java -> 51  DEFAULT = 5         AFTER = 5
-    //współczynni parowania macierzy -> FeromonMatrix.java -> 170               DEFAULT = 0.95      AFTER = 0.97
+    //liczba mutantów po każdej iteracji -> 56                                  DEFAULT = 5
+    //maksymalny czas pracy w ms -> 73                                          DEFAULT = 60 000
+    //współczynni wygładzenia macierzy feromonowej -> FeromonMatrix.java -> 51  DEFAULT = 10
+    //współczynni parowania macierzy -> FeromonMatrix.java -> 170               DEFAULT = 0.94
 
 
 
@@ -44,7 +44,7 @@ public class ProgramMain {
             e.printStackTrace();
         }
 
-        for(int inscance_number = 1; inscance_number <101; inscance_number++) {
+        for(int inscance_number = 1; inscance_number <9; inscance_number++) {
 //        System.out.println("Podaj numer instancji do rozwiązania.");
 //        inscance_number = scanner.nextInt();
 
@@ -57,11 +57,12 @@ public class ProgramMain {
 //*******************WCZYTANIE INSTANCJI Z PLIKU************************
 
             //tworzenie ścieżki do plików
-            path_to_instance = createPathToInstance(size, inscance_number);
+//********NA STALE PIERWSZA INSTANCJA W SCIEZCE***********************
+            path_to_instance = createPathToInstance(size, 1);
             //wczytanie tablicy zadań i przerw z pliku
             Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
             Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
-
+//*******TWORZENIE FOLDERU I SCIEZKI ZAPISU**************
             String filepath = "Wyniki\\rozmiar " + size;
             File folder = new File(filepath);
             folder.mkdir();
@@ -71,7 +72,7 @@ public class ProgramMain {
             LinkedList<Solution> solutions = new LinkedList<>();
             FeromonMatrix feromonMatrix1 = new FeromonMatrix(size);
             FeromonMatrix feromonMatrix2 = new FeromonMatrix(size);
-
+//*********************TWORZENIE PIERWSZEJ POPULACJI ROZWIĄZAŃ********
             for (int i = 0; i < count_in_instance; i++) {
                 Task[] task_clone = cloneTaskArray(tasks);
                 Maintanance[] maintanance_clone = cloneMaintananceArray(maintanances);
@@ -83,7 +84,7 @@ public class ProgramMain {
 
             long start = System.currentTimeMillis();
             long stop = start;
-            long max_time = 60000;
+            long max_time = 60;
             while (stop - start < max_time) {
                 //******************************TWORZENIE POPULACJI*************
                 if (stop - start < max_time * 0.2) {
@@ -103,10 +104,8 @@ public class ProgramMain {
                         solutions.addLast(solution_feromon);
                     }
                 }
-
                 //***************IGRZYSKA************************
                 theHungryGames(solutions, count_in_instance);
-
                 //***************SZUKANIE NAJMNIEJSZEGO**************
                 int min = Integer.MAX_VALUE;
                 for (int i = 0; i < count_in_instance; i++) {
@@ -114,16 +113,14 @@ public class ProgramMain {
                         min = solutions.get(i).getFunction_target();
                     }
                 }
-
                 //****************WYPEŁNIANIE MACIERZY FEROMONOWEJ************
                 for (int i = 0; i < count_in_instance; i++) {
                     feromonMatrix1.addFeromonWay(solutions.get(i).getMachine1(), (double) (min / solutions.get(i).getFunction_target()));
                     feromonMatrix2.addFeromonWay(solutions.get(i).getMachine2(), (double) (min / solutions.get(i).getFunction_target()));
                 }
-
                 //****************USTAWIENIE CZASU AKTUALNEGO*************
                 stop = System.currentTimeMillis();
-
+                //***************PAROWANIE MACIERZY***********************
                 feromonMatrix1.evaporationFeromonWay();
                 feromonMatrix2.evaporationFeromonWay();
             }
@@ -213,6 +210,7 @@ public class ProgramMain {
                 maintanance_time_M2 += x.getDuration();
             }
         }
+        printWriter.println();
         printWriter.println("\n" + time_idle1);
         printWriter.println(time_idle2);
         printWriter.println(maintanance_time_M1);

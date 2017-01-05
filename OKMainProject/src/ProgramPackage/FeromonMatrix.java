@@ -48,7 +48,7 @@ public class FeromonMatrix {
         }
 
         double center_of_funkction = max/2;
-        double wspolczynnik = 5;
+        double wspolczynnik = 10;
         double a = wspolczynnik/(Math.pow(center_of_funkction,2));
 
         double[] array_out = new double[array_in.length];
@@ -169,7 +169,7 @@ public class FeromonMatrix {
                 /**
                  * Współcznynnik parowania do ustalenia
                  */
-                this.feromonMatrix[i][k] *= 0.97;
+                this.feromonMatrix[i][k] *= 0.94;
             }
         }
     }
