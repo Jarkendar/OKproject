@@ -44,7 +44,7 @@ public class ProgramMain {
             e.printStackTrace();
         }
 
-        for(int inscance_number = 1; inscance_number <9; inscance_number++) {
+        for(int inscance_number = 1; inscance_number <61; inscance_number++) {
 //        System.out.println("Podaj numer instancji do rozwiązania.");
 //        inscance_number = scanner.nextInt();
 
@@ -58,7 +58,7 @@ public class ProgramMain {
 
             //tworzenie ścieżki do plików
 //********NA STALE PIERWSZA INSTANCJA W SCIEZCE***********************
-            path_to_instance = createPathToInstance(size, 1);
+            path_to_instance = createPathToInstance(size, inscance_number);
             //wczytanie tablicy zadań i przerw z pliku
             Task[] tasks = readInstanceFromFile(path_to_instance, count_object);
             Maintanance[] maintanances = readMaintananceFromFile(path_to_instance, count_object);
@@ -68,7 +68,7 @@ public class ProgramMain {
             folder.mkdir();
 //**********************FUNKCJA GŁÓWNA ***************************************
             int count_in_instance = 25;
-            int count_mutant_in_iteration = 5;
+            int count_mutant_in_iteration = 12;
             LinkedList<Solution> solutions = new LinkedList<>();
             FeromonMatrix feromonMatrix1 = new FeromonMatrix(size);
             FeromonMatrix feromonMatrix2 = new FeromonMatrix(size);
@@ -84,7 +84,7 @@ public class ProgramMain {
 
             long start = System.currentTimeMillis();
             long stop = start;
-            long max_time = 30000;
+            long max_time = 90000;
             while (stop - start < max_time) {
                 //******************************TWORZENIE POPULACJI*************
                 if (stop - start < max_time * 0.2) {
